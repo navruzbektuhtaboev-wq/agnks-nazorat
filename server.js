@@ -4,134 +4,547 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const WEB_APP_URL = process.env.WEB_APP_URL || '';
+
 const ENGINEER_CHAT_ID = process.env.ENGINEER_CHAT_ID || '';
 const MANAGER_CHAT_ID = process.env.MANAGER_CHAT_ID || '';
 
+const JAMSHID_CHAT_ID = process.env.JAMSHID_CHAT_ID || '';
+const MANSUR_CHAT_ID = process.env.MANSUR_CHAT_ID || '';
+
 const MACHINISTS = [
-  { id: String(process.env.JAMSHID_CHAT_ID || ''), name: 'Мадаминов Жамшидбек' },
-  { id: String(process.env.MANSUR_CHAT_ID || ''), name: 'Жалолов Мансурбек' }
+  {
+    id: String(JAMSHID_CHAT_ID).trim(),
+    name: 'Мадаминов Жамшидбек'
+  },
+  {
+    id: String(MANSUR_CHAT_ID).trim(),
+    name: 'Жалолов Мансурбек'
+  }
 ].filter(x => x.id);
 
-const engineers = new Set(String(ENGINEER_CHAT_ID).split(',').map(s => s.trim()).filter(Boolean));
-const sessions = new Map();
-let lastMachinistMessage = '';
-let lastReport = null;
+let latestMachinistMessage = null;
 
 app.use(express.json({ limit: '200kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// =====================================================
+// TELEGRAM WEB APP INITDATA ТЕКШИРИШ
+// =====================================================
+
 function verifyTelegramInitData(initData) {
   if (!BOT_TOKEN || !initData) return null;
-  const params = new URLSearchParams(initData);
-  const hash = params.get('hash');
-  if (!hash) return null;
-  params.delete('hash');
-  const dataCheckString = [...params.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}=${v}`).join('\n');
-  const secret = crypto.createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest();
-  const expected = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
-  if (expected.length !== hash.length || !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(hash))) return null;
-  const authDate = Number(params.get('auth_date') || 0);
-  if (!authDate || Math.abs(Date.now() / 1000 - authDate) > 86400) return null;
-  try { return JSON.parse(params.get('user') || '{}'); } catch { return null; }
+
+  try {
+    const params = new URLSearchParams(initData);
+    const hash = params.get('hash');
+
+    if (!hash) return null;
+
+    params.delete('hash');
+
+    const dataCheckString = [...params.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}=${value}`)
+      .join('\n');
+
+    const secretKey = crypto
+      .createHmac('sha256', 'WebAppData')
+      .update(BOT_TOKEN)
+      .digest();
+
+    const calculatedHash = crypto
+      .createHmac('sha256', secretKey)
+      .update(dataCheckString)
+      .digest('hex');
+
+    if (calculatedHash.length !== hash.length) return null;
+
+    if (
+      !crypto.timingSafeEqual(
+        Buffer.from(calculatedHash),
+        Buffer.from(hash)
+      )
+    ) {
+      return null;
+    }
+
+    const authDate = Number(params.get('auth_date') || 0);
+
+    // 24 соатдан эски initData қабул қилинмайди
+    if (!authDate || Math.abs(Date.now() / 1000 - authDate) > 86400) {
+      return null;
+    }
+
+    const user = JSON.parse(params.get('user') || '{}');
+
+    return user;
+
+  } catch (error) {
+    console.error('InitData verification error:', error.message);
+    return null;
+  }
 }
 
-function getUser(req) {
-  const user = verifyTelegramInitData(req.body?.initData || req.headers['x-telegram-init-data'] || '');
+
+// =====================================================
+// ФОЙДАЛАНУВЧИНИ АНИҚЛАШ
+// =====================================================
+
+function getUserFromRequest(req) {
+  const initData = String(req.body?.initData || '');
+  const user = verifyTelegramInitData(initData);
+
   if (!user?.id) return null;
-  return { id: String(user.id), firstName: user.first_name || '', lastName: user.last_name || '', username: user.username || '' };
+
+  const telegramId = String(user.id);
+
+  if (telegramId === String(ENGINEER_CHAT_ID).trim()) {
+    return {
+      id: telegramId,
+      name: user.first_name || 'Муҳандис',
+      role: 'engineer'
+    };
+  }
+
+  if (telegramId === String(MANAGER_CHAT_ID).trim()) {
+    return {
+      id: telegramId,
+      name: user.first_name || 'Раҳбар',
+      role: 'manager'
+    };
+  }
+
+  const machinist = MACHINISTS.find(x => x.id === telegramId);
+
+  if (machinist) {
+    return {
+      id: telegramId,
+      name: machinist.name,
+      role: 'machinist'
+    };
+  }
+
+  return {
+    id: telegramId,
+    name: user.first_name || 'Номаълум',
+    role: 'unknown'
+  };
 }
 
-function roleOf(id) {
-  if (engineers.has(String(id))) return 'engineer';
-  if (String(MANAGER_CHAT_ID) === String(id)) return 'manager';
-  const m = MACHINISTS.find(x => x.id === String(id));
-  if (m) return 'machinist';
-  return 'unknown';
-}
 
-async function telegram(method, payload) {
-  if (!BOT_TOKEN) throw new Error('BOT_TOKEN созланмаган.');
-  const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
-  });
-  const data = await r.json();
-  if (!r.ok || !data.ok) throw new Error(data.description || 'Telegram API хатоси.');
+// =====================================================
+// TELEGRAM ХАБАР ЮБОРИШ
+// =====================================================
+
+async function sendTelegramMessage(chatId, text, extra = {}) {
+  if (!BOT_TOKEN) {
+    throw new Error('BOT_TOKEN созланмаган.');
+  }
+
+  if (!chatId) {
+    throw new Error('Telegram chat_id мавжуд эмас.');
+  }
+
+  const response = await fetch(
+    `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: text,
+        ...extra
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok || !data.ok) {
+    throw new Error(data.description || 'Telegram API хатоси.');
+  }
+
   return data;
 }
 
-function rememberMessage(user, message) {
-  lastMachinistMessage = message;
-  lastReport = { userId: user.id, message, createdAt: new Date().toISOString() };
-}
 
-app.get('/api/health', (req, res) => res.json({ ok: true, service: 'AGNKS NAZORAT' }));
-
-app.post('/api/me', (req, res) => {
-  const user = getUser(req);
-  if (!user) return res.status(401).json({ ok:false, error:'Telegram аккаунти тасдиқланмади.' });
-  const role = roleOf(user.id);
-  const machinist = MACHINISTS.find(x => x.id === user.id);
-  res.json({ ok:true, user, role, name: machinist?.name || `${user.firstName} ${user.lastName}`.trim() });
-});
-
-app.post('/api/send-report', async (req, res) => {
-  try {
-    const user = getUser(req);
-    if (!user || roleOf(user.id) !== 'machinist') return res.status(403).json({ok:false,error:'Фақат машинист ҳисобот юборади.'});
-    const message = String(req.body?.message || '').trim();
-    if (!message) return res.status(400).json({ok:false,error:'Хабар бўш.'});
-
-    rememberMessage(user, message);
-    const recipients = new Set();
-    if (ENGINEER_CHAT_ID) recipients.add(String(ENGINEER_CHAT_ID));
-    for (const m of MACHINISTS) if (m.id && m.id !== user.id) recipients.add(m.id);
-    if (!recipients.size) return res.status(500).json({ok:false,error:'Қабул қилувчилар созланмаган.'});
-
-    for (const chat_id of recipients) await telegram('sendMessage', { chat_id, text: message });
-    res.json({ok:true, sentTo:[...recipients]});
-  } catch (e) { res.status(500).json({ok:false,error:e.message}); }
-});
-
-app.post('/api/send-to-manager', async (req, res) => {
-  try {
-    const user = getUser(req);
-    if (!user || roleOf(user.id) !== 'engineer') return res.status(403).json({ok:false,error:'Бу бўлим фақат муҳандис учун.'});
-    if (!MANAGER_CHAT_ID) return res.status(500).json({ok:false,error:'MANAGER_CHAT_ID созланмаган.'});
-    const original = String(req.body?.originalMessage || '').trim();
-    const note = String(req.body?.note || '').trim();
-    if (!original) return res.status(400).json({ok:false,error:'Юбориладиган асосий хабар йўқ.'});
-    const finalMessage = note ? `${original}\n\nҚўшимча изоҳ:\n${note}` : original;
-    await telegram('sendMessage', {chat_id: MANAGER_CHAT_ID, text: finalMessage});
-    res.json({ok:true});
-  } catch (e) { res.status(500).json({ok:false,error:e.message}); }
-});
-
-app.get('/api/latest-machinist-message', (req, res) => {
-  res.json({ok:true, message:lastMachinistMessage, report:lastReport});
-});
+// =====================================================
+// /START — TELEGRAM БОТ
+// =====================================================
 
 app.post('/telegram/webhook', async (req, res) => {
   try {
-    const msg = req.body?.message;
-    const text = msg?.text || '';
-    const chatId = msg?.chat?.id;
-    if (!chatId) return res.sendStatus(200);
-    if (text.startsWith('/start')) {
-      if (!WEB_APP_URL) {
-        await telegram('sendMessage', {chat_id:chatId, text:'Web App URL созланмаган.'});
-      } else {
-        await telegram('sendMessage', {
-          chat_id: chatId,
-          text: '📋 AGNKS назорат тизимини очинг:',
-          reply_markup: { inline_keyboard: [[{ text:'📋 AGNKS назоратни очиш', web_app:{url:WEB_APP_URL} }]] }
+    const update = req.body || {};
+    const message = update.message;
+
+    if (!message?.chat?.id) {
+      return res.json({ ok: true });
+    }
+
+    const chatId = String(message.chat.id);
+    const text = String(message.text || '').trim();
+
+    if (text === '/start' || text.startsWith('/start ')) {
+
+      await sendTelegramMessage(
+        chatId,
+        '👋 AGNKS NAZORAT тизимига хуш келибсиз.\n\n' +
+        'Техник назоратни очиш учун қуйидаги тугмани босинг.',
+        {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                {
+                  text: '📋 AGNKS назоратни очиш',
+                  web_app: {
+                    url: WEB_APP_URL
+                  }
+                }
+              ]
+            ]
+          }
+        }
+      );
+
+      return res.json({ ok: true });
+    }
+
+    // Telegram ID ни аниқлаш учун
+    if (text === '/id') {
+      await sendTelegramMessage(
+        chatId,
+        `🆔 Сизнинг Telegram ID рақамингиз:\n\n${chatId}`
+      );
+
+      return res.json({ ok: true });
+    }
+
+    return res.json({ ok: true });
+
+  } catch (error) {
+    console.error('Webhook error:', error.message);
+    return res.json({ ok: true });
+  }
+});
+
+
+// =====================================================
+// WEB APP — КИМ КИРГАНИНИ АНИҚЛАШ
+// =====================================================
+
+app.post('/api/me', (req, res) => {
+  const user = getUserFromRequest(req);
+
+  if (!user) {
+    return res.status(401).json({
+      ok: false,
+      error: 'Telegram маълумотлари тасдиқланмади.'
+    });
+  }
+
+  if (user.role === 'unknown') {
+    return res.status(403).json({
+      ok: false,
+      error: 'Сиз AGNKS NAZORAT тизимига рўйхатдан ўтмагансиз.',
+      telegramId: user.id
+    });
+  }
+
+  return res.json({
+    ok: true,
+    me: user
+  });
+});
+
+
+// =====================================================
+// МАШИНИСТ ҲИСОБОТИ
+// =====================================================
+
+app.post('/api/send-report', async (req, res) => {
+  try {
+    const user = getUserFromRequest(req);
+
+    if (!user) {
+      return res.status(401).json({
+        ok: false,
+        error: 'Telegram маълумотлари тасдиқланмади.'
+      });
+    }
+
+    if (user.role !== 'machinist') {
+      return res.status(403).json({
+        ok: false,
+        error: 'Фақат машинист ҳисобот юбориши мумкин.'
+      });
+    }
+
+    const message = String(req.body?.message || '').trim();
+
+    if (!message) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Ҳисобот бўш.'
+      });
+    }
+
+    // Охирги машинист хабарини сақлаймиз
+    latestMachinistMessage = {
+      text: message,
+      senderId: user.id,
+      senderName: user.name,
+      createdAt: new Date().toISOString()
+    };
+
+    const recipients = new Set();
+
+    // Муҳандисга
+    if (ENGINEER_CHAT_ID) {
+      recipients.add(String(ENGINEER_CHAT_ID).trim());
+    }
+
+    // Иккинчи машинистга
+    for (const machinist of MACHINISTS) {
+      if (
+        machinist.id &&
+        machinist.id !== user.id
+      ) {
+        recipients.add(machinist.id);
+      }
+    }
+
+    const results = [];
+
+    for (const chatId of recipients) {
+      try {
+        await sendTelegramMessage(chatId, message);
+        results.push({
+          chatId,
+          ok: true
+        });
+      } catch (error) {
+        console.error(
+          `Message send error ${chatId}:`,
+          error.message
+        );
+
+        results.push({
+          chatId,
+          ok: false,
+          error: error.message
         });
       }
     }
-    res.sendStatus(200);
-  } catch { res.sendStatus(200); }
+
+    return res.json({
+      ok: true,
+      sender: user.name,
+      results
+    });
+
+  } catch (error) {
+    console.error('Send report error:', error.message);
+
+    return res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
 });
 
-app.use((req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-app.listen(PORT, () => console.log(`AGNKS server listening on ${PORT}`));
+
+// =====================================================
+// МУҲАНДИС — ОХИРГИ МАШИНИСТ ХАБАРИ
+// =====================================================
+
+app.post('/api/latest-machinist-message', (req, res) => {
+  const user = getUserFromRequest(req);
+
+  if (!user) {
+    return res.status(401).json({
+      ok: false,
+      error: 'Telegram маълумотлари тасдиқланмади.'
+    });
+  }
+
+  if (user.role !== 'engineer') {
+    return res.status(403).json({
+      ok: false,
+      error: 'Фақат муҳандис бу маълумотни кўриши мумкин.'
+    });
+  }
+
+  return res.json({
+    ok: true,
+    message: latestMachinistMessage
+  });
+});
+
+
+// =====================================================
+// МУҲАНДИС → РАҲБАР
+// =====================================================
+
+app.post('/api/send-to-manager', async (req, res) => {
+  try {
+    const user = getUserFromRequest(req);
+
+    if (!user) {
+      return res.status(401).json({
+        ok: false,
+        error: 'Telegram маълумотлари тасдиқланмади.'
+      });
+    }
+
+    if (user.role !== 'engineer') {
+      return res.status(403).json({
+        ok: false,
+        error: 'Фақат муҳандис раҳбарга хабар юбориши мумкин.'
+      });
+    }
+
+    if (!latestMachinistMessage?.text) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Машинист хабари мавжуд эмас.'
+      });
+    }
+
+    if (!MANAGER_CHAT_ID) {
+      return res.status(500).json({
+        ok: false,
+        error: 'MANAGER_CHAT_ID созланмаган.'
+      });
+    }
+
+    // Фақат қўшимча изоҳ оламиз.
+    // Машинистнинг асл хабари клиентдан қабул қилинмайди.
+    const note = String(req.body?.note || '').trim();
+
+    let finalMessage = latestMachinistMessage.text;
+
+    if (note) {
+      finalMessage += `\n\nМуҳандис қўшимча изоҳи:\n${note}`;
+    }
+
+    await sendTelegramMessage(
+      MANAGER_CHAT_ID,
+      finalMessage
+    );
+
+    return res.json({
+      ok: true
+    });
+
+  } catch (error) {
+    console.error(
+      'Send manager error:',
+      error.message
+    );
+
+    return res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+
+// =====================================================
+// БОТНИ ҚЎЛДА ИШГА ТУШИРИШ
+// =====================================================
+
+app.post('/api/start-bot', async (req, res) => {
+  try {
+    if (!BOT_TOKEN) {
+      return res.status(500).json({
+        ok: false,
+        error: 'BOT_TOKEN созланмаган.'
+      });
+    }
+
+    return res.json({
+      ok: true,
+      message: 'Бот тайёр.'
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      error: error.message
+    });
+  }
+});
+
+
+// =====================================================
+// WEBHOOK АВТОМАТИК СОЗИШ
+// =====================================================
+
+async function setupWebhook() {
+  if (!BOT_TOKEN || !WEB_APP_URL) {
+    console.log(
+      'Webhook skipped: BOT_TOKEN ёки WEB_APP_URL йўқ.'
+    );
+    return;
+  }
+
+  try {
+    const webhookUrl =
+      `${WEB_APP_URL.replace(/\/$/, '')}/telegram/webhook`;
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: webhookUrl
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(
+      'Telegram webhook:',
+      data.ok ? 'CONNECTED' : data.description
+    );
+
+  } catch (error) {
+    console.error(
+      'Webhook setup error:',
+      error.message
+    );
+  }
+}
+
+
+// =====================================================
+// САЙТ
+// =====================================================
+
+app.use((req, res) => {
+  res.sendFile(
+    path.join(__dirname, 'public', 'index.html')
+  );
+});
+
+
+// =====================================================
+// SERVER
+// =====================================================
+
+app.listen(PORT, async () => {
+  console.log(`AGNKS server started on port ${PORT}`);
+
+  await setupWebhook();
+});
