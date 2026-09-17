@@ -1,9 +1,10 @@
 {
-  "name": "agnks-avtomatik-telegram",
+  "name": "agnks-nazorat",
   "version": "1.0.0",
   "private": true,
-  "description": "AGNKS nazorat Web App va Telegram muhandis xabarnomasi",
+  "description": "AGNKS NAZORAT Telegram Web App MVP",
   "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "dependencies": { "express": "^5.1.0" }
+  "scripts": {"start": "node server.js"},
+  "engines": {"node": ">=18"},
+  "dependencies": {"express": "^5.1.0"}
 }
