@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AGNKS Nazorat</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f7;color:#17202a;font-family:Arial,sans-serif}
+.wrap{max-width:560px;margin:auto;padding:18px}
+.card{background:#fff;border-radius:18px;padding:20px;box-shadow:0 4px 18px #0001}
+h1{font-size:24px;margin:0 0 6px}
+.sub{color:#68737d;margin-bottom:20px}
+label{display:block;font-weight:700;margin:14px 0 7px}
+input,select,textarea{width:100%;padding:13px;border:1px solid #d7dde2;border-radius:10px;font-size:16px;background:#fff}
+textarea{min-height:95px;resize:vertical}
+button{width:100%;padding:14px;margin-top:18px;border:0;border-radius:11px;background:#1f7ae0;color:#fff;font-size:17px;font-weight:700}
+.ok{margin-top:15px;padding:12px;border-radius:10px;background:#e9f8ee;color:#19733b;display:none}
+.date{font-size:14px;color:#68737d;text-align:right;margin-bottom:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<div class="date" id="date"></div>
+<h1>⛽ AGNKS НАЗОРАТ</h1>
+<div class="sub">Кунлик қисқа техник назорат</div>
+
+<label>Машинист</label>
+<select id="operator">
+<option value="">— Машинистни танланг —</option>
+<option>Мадаминов Жамшидбек</option>
+<option>Жалолов Мансурбек</option>
+</select>
+
+<label>Ускуна</label>
+<select id="equipment" onchange="changeEquipment()">
+<option>Компрессор</option>
+<option>Газ сақлаш баллонлари</option>
+<option>Газ колонкаси</option>
+<option>Юқори босимли газ қувури</option>
+</select>
+
+<div id="fields"></div>
+
+<label>Ҳолати</label>
+<select id="status">
+<option>✅ Норма</option>
+<option>⚠️ Носозлик бор</option>
+</select>
+
+<label>Умумий изоҳ</label>
+<textarea id="general" placeholder="Қўшимча маълумот..."></textarea>
+
+<button onclick="send()">📤 НАЗОРАТНИ ЮБОРИШ</button>
+<button onclick="engineerMessage()" style="background:#16803a">👨‍🔧 МУҲАНДИСГА ХАБАР ТАЙЁРЛАШ</button>
+<button onclick="sendToEngineer()" style="background:#c96b00">📨 МУҲАНДИСГА АВТОМАТИК ЮБОРИШ</button>
+<textarea id="message" style="display:none;margin-top:12px" readonly></textarea>
+<button id="copyBtn" onclick="copyMessage()" style="display:none;background:#6b7280">📋 ХАБАРНИ НУСХАЛАШ</button>
+<div class="ok" id="ok">✅ Маълумот сақланди.</div>
+<div style="margin-top:20px">
+  <button onclick="showAll()" style="background:#4b5563">📋 ҲИСОБОТЛАР</button>
+  <button onclick="clearAll()" style="background:#b42318">🗑 Барча сақланган маълумотни тозалаш</button>
+</div>
+<div id="reportFilters" style="display:none;margin-top:18px">
+<label>Машинист бўйича</label>
+<select id="filterOperator" onchange="showAll()">
+<option>Барчаси</option>
+<option>Мадаминов Жамшидбек</option>
+<option>Жалолов Мансурбек</option>
+</select>
+<label>Ускуна бўйича</label>
+<select id="filterEquipment" onchange="showAll()">
+<option>Барчаси</option>
+<option>Компрессор</option>
+<option>Газ сақлаш баллонлари</option>
+<option>Газ колонкаси</option>
+<option>Юқори босимли газ қувури</option>
+</select>
+<label>Ҳолати</label>
+<select id="filterStatus" onchange="showAll()">
+<option>Барчаси</option>
+<option>✅ Норма</option>
+<option>⚠️ Носозлик бор</option>
+</select>
+</div>
+<div id="history" style="margin-top:20px"></div>
+</div>
+</div>
+
+<script>
+document.getElementById("date").textContent =
+  new Date().toLocaleDateString("uz-UZ");
+
+function changeEquipment(){
+  const e=document.getElementById("equipment").value;
+  const f=document.getElementById("fields");
+
+  if(e==="Компрессор"){
+    f.innerHTML=`
+      <label>Компрессор ҳолати</label>
+      <input id="detail1" placeholder="Масалан: нормал">
+      <label>Изоҳ</label>
+      <textarea id="detail2" placeholder="Компрессордаги ҳолат ёки носозлик..."></textarea>`;
+  } else if(e==="Газ сақлаш баллонлари"){
+    f.innerHTML=`
+      <label>Баллонлар ҳолати</label>
+      <input id="detail1" placeholder="Масалан: босим нормал">
+      <label>Изоҳ</label>
+      <textarea id="detail2" placeholder="Баллонлар ҳолати ёки носозлик..."></textarea>`;
+  } else if(e==="Газ колонкаси"){
+    f.innerHTML=`
+      <label>Колонка рақами</label>
+      <input id="detail1" placeholder="Масалан: 1-колонка">
+      <label>Изоҳ</label>
+      <textarea id="detail2" placeholder="Колонка ҳолати ёки носозлик..."></textarea>`;
+  } else {
+    f.innerHTML=`
+      <label>Қувур участкаси</label>
+      <select id="section">
+        <option>1-участка (0–1 км)</option>
+        <option>2-участка (1–2 км)</option>
+        <option>3-участка (2–3 км)</option>
+        <option>4-участка (3–4 км)</option>
+        <option>5-участка (4–5 км)</option>
+        <option>6-участка (5–6 км)</option>
+      </select>
+      <label>Носоз жой масофаси (км)</label>
+      <input id="detail1" type="number" min="0" max="6" step="0.1" placeholder="Масалан: 4.2">
+      <label>Муаммо тури</label>
+      <select id="problem">
+        <option>Газ сизиши</option>
+        <option>Қувур шикастланган</option>
+        <option>Коррозия</option>
+        <option>Арматура муаммоси</option>
+        <option>Бошқа</option>
+      </select>
+      <label>Жой / мўлжал</label>
+      <input id="location" placeholder="Масалан: кўприк ёнида">
+      <label>Батафсил изоҳ</label>
+      <textarea id="detail2" placeholder="Носозликни батафсил ёзинг..."></textarea>`;
+  }
+}
+
+function send(){
+  const operator=document.getElementById("operator").value;
+  if(!operator){ alert("Машинистни танланг"); return; }
+
+  const equipment=document.getElementById("equipment").value;
+  const status=document.getElementById("status").value;
+  const general=document.getElementById("general").value;
+  let detail={};
+
+  if(equipment==="Юқори босимли газ қувури"){
+    detail={
+      section:document.getElementById("section").value,
+      distance:document.getElementById("detail1").value,
+      problem:document.getElementById("problem").value,
+      location:document.getElementById("location").value,
+      note:document.getElementById("detail2").value
+    };
+  }else{
+    detail={
+      main:document.getElementById("detail1").value,
+      note:document.getElementById("detail2").value
+    };
+  }
+
+  const records=JSON.parse(localStorage.getItem("agnks_records")||"[]");
+  records.unshift({
+    date:new Date().toLocaleString("uz-UZ"),
+    operator,equipment,status,general,detail
+  });
+  localStorage.setItem("agnks_records",JSON.stringify(records.slice(0,30)));
+
+  document.getElementById("ok").style.display="block";
+  showHistory();
+}
+
+function showHistory(){
+  const records=JSON.parse(localStorage.getItem("agnks_records")||"[]");
+  const box=document.getElementById("history");
+  if(!records.length){box.innerHTML="";return;}
+  box.innerHTML='<h3 style="margin-bottom:8px">📋 Охирги назоратлар</h3>'+
+    records.slice(0,5).map((r)=>
+      `<div style="border:1px solid #e0e4e8;border-radius:10px;padding:10px;margin:7px 0;background:#fafafa">
+        <b>${r.operator}</b> — ${r.equipment}<br>
+        <span style="color:#68737d;font-size:13px">${r.date}</span><br>
+        ${r.status}
+      </div>`).join("");
+}
+
+function engineerMessage(){
+  const operator=document.getElementById("operator").value;
+  if(!operator){alert("Машинистни танланг");return;}
+  const equipment=document.getElementById("equipment").value;
+  const status=document.getElementById("status").value;
+  const general=document.getElementById("general").value;
+  let msg="⛽ AGNKS НАЗОРАТ\\n\\n";
+  msg+="👷 Машинист: "+operator+"\\n";
+  msg+="🔧 Ускуна: "+equipment+"\\n";
+  msg+="📌 Ҳолати: "+status+"\\n";
+
+  if(equipment==="Юқори босимли газ қувури"){
+    msg+="📍 Участка: "+document.getElementById("section").value+"\\n";
+    msg+="📏 Масофа: "+(document.getElementById("detail1").value||"кўрсатилмаган")+" км\\n";
+    msg+="⚠️ Муаммо: "+document.getElementById("problem").value+"\\n";
+    msg+="🧭 Мўлжал: "+(document.getElementById("location").value||"кўрсатилмаган")+"\\n";
+    msg+="📝 Изоҳ: "+(document.getElementById("detail2").value||"йўқ")+"\\n";
+  } else {
+    msg+="📊 Маълумот: "+(document.getElementById("detail1").value||"кўрсатилмаган")+"\\n";
+    msg+="📝 Изоҳ: "+(document.getElementById("detail2").value||"йўқ")+"\\n";
+  }
+  if(general) msg+="📝 Қўшимча: "+general+"\\n";
+
+  const box=document.getElementById("message");
+  box.value=msg.replace(/\\\\n/g,"\\n");
+  box.style.display="block";
+  document.getElementById("copyBtn").style.display="block";
+}
+
+async function sendToEngineer(){
+  const operator=document.getElementById("operator").value;
+  if(!operator){alert("Машинистни танланг");return;}
+  engineerMessage();
+  const message=document.getElementById("message").value;
+  try{
+    const res=await fetch("/api/send-report",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message})
+    });
+    const data=await res.json();
+    if(!res.ok || !data.ok) throw new Error(data.error||"Юборишда хатолик");
+    alert("✅ Хабар муҳандисга Telegram орқали юборилди.");
+  }catch(e){
+    alert("❌ Хабар юборилмади. Серверда BOT_TOKEN ва ENGINEER_CHAT_ID созланганини текширинг.\n\n"+e.message);
+  }
+}
+
+async function copyMessage(){
+  const box=document.getElementById("message");
+  try{
+    await navigator.clipboard.writeText(box.value);
+    alert("Хабар нусхаланди. Энди Telegram'да муҳандисга юборишингиз мумкин.");
+  }catch(e){
+    box.select();
+    document.execCommand("copy");
+    alert("Хабар нусхаланди.");
+  }
+}
+
+function showAll(){
+  const records=JSON.parse(localStorage.getItem("agnks_records")||"[]");
+  const box=document.getElementById("history");
+  document.getElementById("reportFilters").style.display="block";
+  if(!records.length){box.innerHTML="<p>Ҳозирча ҳисобот йўқ.</p>";return;}
+
+  const fo=document.getElementById("filterOperator").value;
+  const fe=document.getElementById("filterEquipment").value;
+  const fs=document.getElementById("filterStatus").value;
+  const filtered=records.filter(r=>
+    (fo==="Барчаси"||r.operator===fo) &&
+    (fe==="Барчаси"||r.equipment===fe) &&
+    (fs==="Барчаси"||r.status===fs)
+  );
+
+  if(!filtered.length){box.innerHTML="<p>Танланган шарт бўйича маълумот топилмади.</p>";return;}
+
+  box.innerHTML='<h3>📋 Ҳисоботлар ('+filtered.length+')</h3>'+
+    filtered.map((r)=>
+      `<div style="border:1px solid #d7dde2;border-radius:12px;padding:12px;margin:8px 0;background:#fff">
+        <b>${r.operator}</b><br>
+        📅 ${r.date}<br>
+        🔧 ${r.equipment}<br>
+        ${r.status}
+        ${r.detail.section?'<br>📍 '+r.detail.section:''}
+        ${r.detail.distance?'<br>📏 '+r.detail.distance+' км':''}
+        ${r.detail.problem?'<br>⚠️ '+r.detail.problem:''}
+        ${r.detail.location?'<br>🧭 '+r.detail.location:''}
+        ${r.detail.main?'<br>📊 '+r.detail.main:''}
+        ${r.detail.note?'<br>📝 '+r.detail.note:''}
+        ${r.general?'<br>📝 '+r.general:''}
+      </div>`).join("");
+}
+
+function clearAll(){
+  if(confirm("Барча сақланган ҳисоботлар ўчирилсинми?")){
+    localStorage.removeItem("agnks_records");
+    showHistory();
+  }
+}
+
+changeEquipment();
+showHistory();
+</script>
+</body>
+</html>
