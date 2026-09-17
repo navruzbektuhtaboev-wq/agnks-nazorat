@@ -1,46 +1,1408 @@
 <!doctype html>
 <html lang="uz-Cyrl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>AGNKS NAZORAT</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#eef4f8;color:#15324b}.top{background:linear-gradient(135deg,#075c86,#1287b8);color:#fff;padding:18px 16px 20px;position:sticky;top:0;z-index:5}.brand{font-size:22px;font-weight:800}.sub{opacity:.9;font-size:12px;margin-top:4px}.wrap{max-width:760px;margin:auto;padding:14px}.card{background:#fff;border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:0 4px 18px #17384b12}.user{display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{background:#e8f2fa;border-radius:999px;padding:7px 10px;font-size:12px}.time{font-weight:800;color:#0876ad}.group h3{margin:4px 0 10px;font-size:16px}.equip{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-top:1px solid #edf1f4;cursor:pointer}.equip:first-of-type{border-top:0}.num{width:30px;height:30px;border-radius:9px;background:#0b79bd;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:800;margin-right:9px}.ename{flex:1;font-weight:650;font-size:14px}.arrow{font-size:20px;color:#7b8d9b}.search,input,textarea{width:100%;border:1px solid #d6e0e7;border-radius:12px;padding:12px;font:inherit;background:#fff}.search{margin-bottom:12px}.hidden{display:none}.status{display:block;width:100%;border:0;border-radius:14px;padding:15px;margin:9px 0;font-size:15px;font-weight:800;text-align:left;cursor:pointer}.ok{background:#dff7e7;color:#08763b}.warn{background:#fff1c9;color:#8a5b00}.bad{background:#ffdfe1;color:#a31e28}.status.selected{outline:3px solid #0b79bd55}.field{margin-top:10px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.btn{width:100%;border:0;border-radius:14px;padding:14px;background:#087bc1;color:white;font-size:16px;font-weight:800;cursor:pointer}.btn.green{background:#11a34a}.btn.gray{background:#e7eef3;color:#24445a}.msg{padding:12px;border-radius:12px;background:#f4f8fb;white-space:pre-wrap;font-size:13px;max-height:260px;overflow:auto}.readonly{background:#f5f8fa}.nav{display:flex;gap:8px;position:sticky;bottom:0;background:#eef4f8;padding:8px 0}.nav button{flex:1;border:0;background:#fff;padding:11px 4px;border-radius:12px;font-size:11px;color:#35566d}.count{float:right;background:#edf4f9;border-radius:20px;padding:3px 8px}.success{background:#dcf8e6;color:#08763b;padding:12px;border-radius:12px;font-weight:700}
-</style></head>
-<body><div class="top"><div class="brand">💧 AGNKS NAZORAT</div><div class="sub">Техник назорат тизими • POYTUG 888 AGNKS</div></div>
-<div class="wrap" id="app"></div>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#eef5f9;
+  color:#17324a;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+
+.top{
+  background:#1287b5;
+  color:white;
+  padding:24px 20px 22px;
+}
+
+.brand{
+  font-size:27px;
+  font-weight:800;
+}
+
+.sub{
+  margin-top:8px;
+  font-size:14px;
+  opacity:.92;
+}
+
+.wrap{
+  max-width:900px;
+  margin:auto;
+  padding:14px 12px 100px;
+}
+
+.card{
+  background:white;
+  border-radius:24px;
+  margin:12px 0;
+  padding:18px;
+  box-shadow:0 4px 16px rgba(30,70,90,.08);
+}
+
+.user-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.user-name{
+  font-size:22px;
+  font-weight:800;
+}
+
+.role{
+  margin-top:5px;
+  color:#607789;
+  font-size:14px;
+}
+
+.date{
+  background:#edf5fa;
+  padding:10px 14px;
+  border-radius:20px;
+  white-space:nowrap;
+  font-size:13px;
+}
+
+.title{
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:14px;
+}
+
+.info{
+  color:#506b7c;
+  font-size:15px;
+  line-height:1.5;
+}
+
+.search{
+  width:100%;
+  border:2px solid #d9e6ed;
+  border-radius:18px;
+  padding:15px;
+  font-size:16px;
+  outline:none;
+}
+
+.group{
+  background:white;
+  border-radius:24px;
+  margin:14px 0;
+  overflow:hidden;
+  box-shadow:0 4px 16px rgba(30,70,90,.07);
+}
+
+.group-head{
+  padding:18px 18px 10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.group-name{
+  font-size:20px;
+  font-weight:800;
+}
+
+.count{
+  background:#eef5f9;
+  border-radius:20px;
+  padding:8px 12px;
+  font-weight:700;
+}
+
+.item{
+  padding:15px 18px;
+  border-top:1px solid #edf1f3;
+  cursor:pointer;
+}
+
+.item-main{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+
+.num{
+  min-width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#1287b5;
+  color:white;
+  border-radius:14px;
+  font-size:17px;
+  font-weight:800;
+}
+
+.item-name{
+  flex:1;
+  font-size:17px;
+  font-weight:650;
+}
+
+.arrow{
+  color:#8295a2;
+  font-size:24px;
+}
+
+.status-box{
+  display:none;
+  margin-top:14px;
+  padding:14px;
+  background:#f7fafc;
+  border-radius:16px;
+}
+
+.item.open .status-box{
+  display:block;
+}
+
+.status-buttons{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+}
+
+.status-btn{
+  border:2px solid #dbe7ed;
+  background:white;
+  border-radius:14px;
+  padding:12px;
+  text-align:left;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.status-btn.active{
+  border-color:#1287b5;
+  background:#eef9fd;
+}
+
+.field{
+  margin-top:12px;
+}
+
+.field label{
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+textarea{
+  width:100%;
+  min-height:80px;
+  border:2px solid #d9e6ed;
+  border-radius:14px;
+  padding:12px;
+  font-size:15px;
+  resize:vertical;
+  font-family:inherit;
+}
+
+.bottom{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(12px);
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 18px rgba(0,0,0,.08);
+  z-index:20;
+}
+
+.bottom-inner{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  gap:8px;
+}
+
+.btn{
+  flex:1;
+  border:0;
+  border-radius:15px;
+  padding:14px 10px;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.btn-save{
+  background:#e8f2f7;
+  color:#17617e;
+}
+
+.btn-send{
+  background:#1287b5;
+  color:white;
+}
+
+.notice{
+  text-align:center;
+  padding:35px 20px;
+  font-size:17px;
+  line-height:1.6;
+}
+
+.manager-box{
+  margin-top:12px;
+  padding:16px;
+  background:#f6fafc;
+  border-radius:18px;
+}
+
+.original{
+  white-space:pre-wrap;
+  background:white;
+  border:1px solid #e0e9ee;
+  border-radius:14px;
+  padding:14px;
+  line-height:1.5;
+}
+
+.empty{
+  color:#728795;
+  text-align:center;
+  padding:25px;
+}
+
+.success{
+  background:#eaf8ef;
+  color:#19733c;
+  padding:13px;
+  border-radius:14px;
+  margin-top:12px;
+}
+
+.error{
+  background:#fff0f0;
+  color:#a52b2b;
+  padding:13px;
+  border-radius:14px;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <div class="brand">💧 AGNKS NAZORAT</div>
+  <div class="sub">Техник назорат тизими • POYTUG 888 AGNKS</div>
+</div>
+
+<div class="wrap" id="app">
+  <div class="notice">⏳ Тизим юкланмоқда...</div>
+</div>
+
 <script>
-const tg=window.Telegram?.WebApp; if(tg){tg.ready();tg.expand();}
-const initData=tg?.initData||'';
-const groups=[
-['Компрессор тизими',['Компрессор №1','Компрессор №2','Электродвигатель','Компрессор мойлаш тизими','Компрессор совитиш тизими','Кириш фильтри','Газ фильтри','Мой фильтри','Мой ажратгич','Компрессор манометри','Компрессор ҳарорат датчиги']],
-['Газ қабул қилиш тизими',['Кириш газ қувури','Газ фильтри','Газ сепаратори','Газ ҳисоблагич']],
-['Давлат пломбалари назорати',['Давлат пломбаси — соз ҳолатда, ташқи таъсир кўрсатилмаган','Давлат пломбаси — ташқи таъсир оқибатида узилган','Давлат пломбаси — ташқи таъсир белгилари мавжуд']],
-['Юқори босимли газ тизими',['Юқори босимли газ қувури','Запор арматураси','Шарли кранлар','Қайтариш клапанлари','Хавфсизлик клапанлари','Юқори босим манометрлари','Босим датчиклари']],
-['Газ сақлаш тизими',['Каскад газ баллонлари','1-каскад','2-каскад','3-каскад','Баллон вентиллари','Каскад манометрлари','Баллон қувурлари','Баллон хавфсизлик клапанлари']],
-['Газ тўлдириш колонкалари',['Газ колонкаси №1','Газ колонкаси №2','Газ колонкаси №3','Газ колонкаси №4','Газ колонкаси №5','Газ колонкаси №6','Газ колонкаси №7','Газ колонкаси №8']],
-['Электр тизими',['Электр щити','Автомат ўчиргичлар','Электр кабеллари','Заземление тизими','Электр двигателлари']],
-['Назорат ва совитиш',['Газ сигнализатори','Газ анализатори','Чиллер','Сув насоси','Сув резервуари']],
-['Ёнғин хавфсизлиги',['ОП-5 ўт ўчиргич','ОП-10 ўт ўчиргич','ОП-50 ўт ўчиргич','ОУ-5 ўт ўчиргич','Ёнғин щити','Қум қутиси']],
-['Бирикмалар',['Фланецли бирикмалар','Резьбали бирикмалар']]
+
+const tg = window.Telegram?.WebApp;
+
+if(tg){
+  tg.ready();
+  tg.expand();
+}
+
+const initData = tg?.initData || '';
+
+
+// ======================================================
+// УСКУНАЛАР
+// ======================================================
+
+const groups = [
+
+[
+"Компрессор тизими",
+[
+"Компрессор №1",
+"Компрессор №2",
+"Электродвигатель",
+"Компрессор мойлаш тизими",
+"Компрессор совитиш тизими",
+"Кириш фильтри",
+"Газ фильтри",
+"Мой фильтри",
+"Мой ажратгич",
+"Компрессор манометри",
+"Компрессор ҳарорат датчиги"
+]
+],
+
+[
+"Газ қабул қилиш тизими",
+[
+"Кириш газ қувури",
+"Газ фильтри",
+"Газ сепаратори",
+"Газ ҳисоблагич"
+]
+],
+
+[
+"Давлат пломбалар назорати",
+[
+"Давлат пломбаси — соз ҳолатда, ташқи таъсир кўрсатилмаган",
+"Давлат пломбаси — ташқи таъсир оқибатида узилган",
+"Давлат пломбаси — ташқи таъсир белгилари мавжуд"
+]
+],
+
+[
+"Юқори босимли газ тизими",
+[
+"Юқори босимли газ қувури",
+"Запор арматураси",
+"Шарли кранлар",
+"Қайтариш клапанлари",
+"Хавфсизлик клапанлари",
+"Юқори босим манометрлари",
+"Босим датчиклари"
+]
+],
+
+[
+"Газ сақлаш тизими",
+[
+"Каскад газ баллонлари",
+"1-каскад",
+"2-каскад",
+"3-каскад",
+"Баллон вентиллари",
+"Каскад манометрлари",
+"Баллон қувурлари",
+"Баллон хавфсизлик клапанлари"
+]
+],
+
+[
+"Газ тўлдириш колонкалари",
+[
+"Газ колонкаси №1",
+"Газ колонкаси №2",
+"Газ колонкаси №3",
+"Газ колонкаси №4",
+"Газ колонкаси №5",
+"Газ колонкаси №6",
+"Газ колонкаси №7",
+"Газ колонкаси №8"
+]
+],
+
+[
+"Электр тизими",
+[
+"Электр щити",
+"Автомат ўчиргичлар",
+"Электр кабеллари",
+"Заземление тизими",
+"Электр двигателлари"
+]
+],
+
+[
+"Назорат ва совитиш",
+[
+"Газ сигнализатори",
+"Газ анализатори",
+"Чиллер",
+"Сув насоси",
+"Сув резервуари"
+]
+],
+
+[
+"Ёнғин хавфсизлиги",
+[
+"ОП-5 ўт ўчиргич",
+"ОП-10 ўт ўчиргич",
+"ОП-50 ўт ўчиргич",
+"ОУ-5 ўт ўчиргич",
+"Ёнғин щити",
+"Қум қутиси"
+]
+],
+
+[
+"Бирикмалар",
+[
+"Фланецли бирикмалар",
+"Резьбали бирикмалар"
+]
+]
+
 ];
-const items=groups.flatMap(g=>g[1]);
-let selected={}, current=null, me=null;
-const app=document.getElementById('app');
-async function api(url,body){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,initData})});return r.json()}
-async function boot(){if(!initData){renderNotice('Telegram Web App орқали очинг.','Браузерда тўғридан-тўғри очиш учун Telegram ботда /start босинг.');return} const x=await api('/api/me',{});if(!x.ok){renderNotice('Кириш тасдиқланмади',x.error);return}me=x; renderHome();}
-function renderNotice(a,b){app.innerHTML=`<div class="card"><h2>${a}</h2><p>${b}</p></div>`}
-function renderHome(){app.innerHTML=`<div class="card user"><div><b>${me.name}</b><div class="sub">Роль: ${me.role}</div></div><span class="pill">17.09.2026</span></div><div class="card"><div class="time">📋 Назорат вақти: 08:00 / 12:00 / 17:00</div><p style="font-size:13px">Ускуналар: <b>59 та</b></p><input class="search" placeholder="🔎 Ускуна номини қидириш..." oninput="filterItems(this.value)"></div><div id="list"></div>${me.role==='engineer'?'<div class="card"><button class="btn" onclick="engineer()">✉️ Раҳбарга хабар</button></div>':''}`;drawList();}
-function drawList(q=''){let html='';let n=0;for(const [title,arr] of groups){const rows=arr.map(name=>{n++;if(q&&!name.toLowerCase().includes(q.toLowerCase()))return '';const idx=items.indexOf(name)+1;return `<div class="equip" onclick="openEquip(${idx})"><span class="num">${idx}</span><span class="ename">${name}</span><span class="arrow">›</span></div>`}).join('');if(rows.trim())html+=`<div class="card group"><h3>${title} <span class="count">${arr.length}</span></h3>${rows}</div>`}document.getElementById('list').innerHTML=html;}
-function filterItems(q){drawList(q)}
-function openEquip(i){current=i;const name=items[i-1];const v=selected[i]||{};app.innerHTML=`<div class="card"><div style="font-size:13px">УСКУНА ${i} / 59</div><h2>${name}</h2><button class="status ok ${v.status==='ok'?'selected':''}" onclick="choose('ok')">🟢 Соз ҳолатда</button><button class="status warn ${v.status==='warn'?'selected':''}" onclick="choose('warn')">🟡 Камчиликлар бор</button><button class="status bad ${v.status==='bad'?'selected':''}" onclick="choose('bad')">🔴 Носоз ҳолатда</button><div id="fields"></div><div style="display:flex;gap:8px;margin-top:14px"><button class="btn gray" onclick="renderHome()">← Рўйхат</button><button class="btn" onclick="saveEquip()">Сақлаш →</button></div></div>`;if(v.status)choose(v.status)}
-function choose(s){selected[current]={...(selected[current]||{}),status:s};document.querySelectorAll('.status').forEach(x=>x.classList.remove('selected'));document.querySelector('.'+({ok:'ok',warn:'warn',bad:'bad'}[s])).classList.add('selected');const f=document.getElementById('fields');if(s==='ok')f.innerHTML='';else if(s==='warn')f.innerHTML=`<div class="field"><label>Изоҳ</label><textarea id="note" placeholder="Камчилик ҳақида ёзинг...">${selected[current].note||''}</textarea></div>`;else f.innerHTML=`<div class="field"><label>Носозлик сабаби</label><input id="reason" value="${selected[current].reason||''}" placeholder="Сабабини ёзинг..."><label style="margin-top:10px">Қўшимча изоҳ</label><textarea id="note" placeholder="Қўшимча маълумот...">${selected[current].note||''}</textarea></div>`}
-function saveEquip(){const v=selected[current];if(v.status==='warn')v.note=document.getElementById('note')?.value||'';if(v.status==='bad'){v.reason=document.getElementById('reason')?.value||'';v.note=document.getElementById('note')?.value||''}renderHome()}
-function buildReport(){const lines=[`📋 AGNKS ТЕХНИК НАЗОРАТ`,`👷 Машинист: ${me.name}`,`🕐 Назорат: 08:00 / 12:00 / 17:00`,`📅 17.09.2026`,``,`УСКУНАЛАР:`];items.forEach((name,i)=>{const v=selected[i+1];if(!v)return;lines.push(`${i+1}. ${name} — ${v.status==='ok'?'🟢 Соз ҳолатда':v.status==='warn'?'🟡 Камчиликлар бор':'🔴 Носоз ҳолатда'}`);if(v.reason)lines.push(`   Носозлик сабаби: ${v.reason}`);if(v.note)lines.push(`   Изоҳ: ${v.note}`)});return lines.join('\n')}
-async function submit(){const missing=items.findIndex((_,i)=>!selected[i+1]);if(missing>=0){alert(`№${missing+1} ускуна ҳолати белгиланмаган.`);openEquip(missing+1);return}const message=buildReport();const r=await api('/api/send-report',{message});if(r.ok){app.innerHTML=`<div class="card"><div class="success">✅ Ҳисобот муҳандис ва иккинчи машинистга юборилди.</div><h3>Ҳисобот тайёр</h3><div class="msg">${message}</div><button class="btn green" onclick="renderHome()">Янги назорат</button></div>`}else alert(r.error)}
-function engineer(){api('/api/latest-machinist-message',{}).then(x=>{app.innerHTML=`<div class="card"><h2>✉️ Раҳбарга хабар</h2><p style="font-size:13px">Муҳандис учун: машинистнинг охирги хабари ўзгармас ҳолда қолади.</p><div class="msg readonly">${x.message||'Ҳозирча машинист хабари йўқ.'}</div><div class="field"><label>Қўшимча изоҳ (ихтиёрий)</label><textarea id="managerNote" placeholder="Фақат пастига қўшилади..."></textarea></div><button class="btn green" onclick="sendManager(${JSON.stringify(x.message||'')})">Раҳбарга юбориш</button><button class="btn gray" style="margin-top:8px" onclick="renderHome()">← Орқага</button></div>`})}
-async function sendManager(original){if(!original)return alert('Машинист хабари мавжуд эмас.');const note=document.getElementById('managerNote').value;const r=await api('/api/send-to-manager',{originalMessage:original,note});alert(r.ok?'✅ Раҳбарга юборилди.':r.error)}
-app.insertAdjacentHTML('beforeend','');
-window.openEquip=openEquip;window.choose=choose;window.saveEquip=saveEquip;window.filterItems=filterItems;window.submit=submit;window.engineer=engineer;window.sendManager=sendManager;
+
+const allItems = groups.flatMap(g => g[1]);
+
+
+// ======================================================
+// ҲОЛАТ
+// ======================================================
+
+const state = {};
+
+allItems.forEach((name,index)=>{
+  state[index+1] = {
+    name,
+    status:"",
+    note:"",
+    reason:""
+  };
+});
+
+
+// ======================================================
+// API
+// ======================================================
+
+async function api(url, body={}){
+
+  const response = await fetch(url,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      ...body,
+      initData
+    })
+  });
+
+  let data;
+
+  try{
+    data = await response.json();
+  }catch(e){
+    throw new Error("Сервердан нотўғри жавоб келди.");
+  }
+
+  if(!response.ok){
+    throw new Error(data.error || "Сервер хатоси.");
+  }
+
+  return data;
+}
+
+
+// ======================================================
+// КУН
+// ======================================================
+
+function today(){
+
+  const d = new Date();
+
+  return String(d.getDate()).padStart(2,"0")
+    + "."
+    + String(d.getMonth()+1).padStart(2,"0")
+    + "."
+    + d.getFullYear();
+
+}
+
+
+// ======================================================
+// РОЛЬ
+// ======================================================
+
+function roleText(role){
+
+  if(role==="machinist") return "👷 Машинист";
+  if(role==="engineer") return "👨‍🔧 Муҳандис";
+  if(role==="manager") return "👔 Раҳбар";
+
+  return "Фойдаланувчи";
+
+}
+
+
+// ======================================================
+// САҚЛАШ
+// ======================================================
+
+function saveLocal(){
+
+  try{
+    localStorage.setItem(
+      "agnks_control",
+      JSON.stringify(state)
+    );
+
+    showMessage(
+      "success",
+      "💾 Маълумотлар телефонда сақланди."
+    );
+
+  }catch(e){
+    showMessage(
+      "error",
+      "Сақлашда хатолик."
+    );
+  }
+
+}
+
+
+// ======================================================
+// ЮКЛАШ
+// ======================================================
+
+function loadLocal(){
+
+  try{
+
+    const saved = localStorage.getItem(
+      "agnks_control"
+    );
+
+    if(!saved) return;
+
+    const data = JSON.parse(saved);
+
+    Object.keys(data).forEach(id=>{
+
+      if(state[id]){
+
+        state[id].status = data[id].status || "";
+        state[id].note = data[id].note || "";
+        state[id].reason = data[id].reason || "";
+
+      }
+
+    });
+
+  }catch(e){}
+
+}
+
+
+// ======================================================
+// ХАБАР
+// ======================================================
+
+function showMessage(type,text){
+
+  const old = document.querySelector(".flash");
+
+  if(old) old.remove();
+
+  const div = document.createElement("div");
+
+  div.className =
+    "flash " +
+    (type==="success" ? "success":"error");
+
+  div.textContent = text;
+
+  document
+    .getElementById("app")
+    .prepend(div);
+
+  setTimeout(()=>{
+    div.remove();
+  },3500);
+
+}
+
+
+// ======================================================
+// ITEM HTML
+// ======================================================
+
+function itemHTML(id,name){
+
+  const s = state[id];
+
+  return `
+  <div class="item" id="item-${id}" onclick="toggleItem(${id})">
+
+    <div class="item-main">
+
+      <div class="num">${id}</div>
+
+      <div class="item-name">
+        ${name}
+      </div>
+
+      <div class="arrow">›</div>
+
+    </div>
+
+    <div class="status-box" onclick="event.stopPropagation()">
+
+      <div class="status-buttons">
+
+        <button
+          class="status-btn ${s.status==="ok"?"active":""}"
+          onclick="setStatus(${id},'ok')"
+        >
+          🟢 Соз ҳолатда
+        </button>
+
+        <button
+          class="status-btn ${s.status==="minor"?"active":""}"
+          onclick="setStatus(${id},'minor')"
+        >
+          🟡 Камчиликлар бор
+        </button>
+
+        <button
+          class="status-btn ${s.status==="bad"?"active":""}"
+          onclick="setStatus(${id},'bad')"
+        >
+          🔴 Носоз ҳолатда
+        </button>
+
+      </div>
+
+      <div
+        class="field"
+        id="note-box-${id}"
+        style="display:${s.status==="minor"?"block":"none"}"
+      >
+        <label>Изоҳ</label>
+
+        <textarea
+          onchange="state[${id}].note=this.value"
+          placeholder="Камчилик ҳақида изоҳ..."
+        >${s.note}</textarea>
+      </div>
+
+      <div
+        class="field"
+        id="reason-box-${id}"
+        style="display:${s.status==="bad"?"block":"none"}"
+      >
+
+        <label>Носозлик сабаби</label>
+
+        <textarea
+          onchange="state[${id}].reason=this.value"
+          placeholder="Носозлик сабабини ёзинг..."
+        >${s.reason}</textarea>
+
+        <div class="field">
+
+          <label>Қўшимча изоҳ</label>
+
+          <textarea
+            onchange="state[${id}].note=this.value"
+            placeholder="Қўшимча маълумот..."
+          >${s.note}</textarea>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  `;
+}
+
+
+// ======================================================
+// ITEM ОЧИШ
+// ======================================================
+
+function toggleItem(id){
+
+  const el = document.getElementById(
+    "item-"+id
+  );
+
+  if(el){
+    el.classList.toggle("open");
+  }
+
+}
+
+
+// ======================================================
+// STATUS
+// ======================================================
+
+function setStatus(id,status){
+
+  state[id].status = status;
+
+  const item =
+    document.getElementById("item-"+id);
+
+  if(!item) return;
+
+  item.outerHTML =
+    itemHTML(id,state[id].name);
+
+  document
+    .getElementById("item-"+id)
+    .classList.add("open");
+
+}
+
+
+// ======================================================
+// МАШИНИСТ ИНТЕРФЕЙСИ
+// ======================================================
+
+function renderMachinist(me){
+
+  loadLocal();
+
+  const app =
+    document.getElementById("app");
+
+  let html = `
+
+  <div class="card user-card">
+
+    <div>
+
+      <div class="user-name">
+        👷 ${me.name || "Машинист"}
+      </div>
+
+      <div class="role">
+        Роль: ${roleText(me.role)}
+      </div>
+
+    </div>
+
+    <div class="date">
+      ${today()}
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <div class="title">
+      📋 Назорат вақти: 08:00 / 12:00 / 17:00
+    </div>
+
+    <div class="info">
+      Ускуналар: <b>59 та</b>
+    </div>
+
+    <div style="margin-top:14px">
+      <input
+        id="search"
+        class="search"
+        placeholder="🔎 Ускуна номини қидириш..."
+        oninput="filterItems()"
+      >
+    </div>
+
+  </div>
+
+  <div id="equipment"></div>
+
+  `;
+
+  app.innerHTML = html;
+
+  renderEquipment();
+
+  app.insertAdjacentHTML(
+    "beforeend",
+    `
+    <div class="bottom">
+
+      <div class="bottom-inner">
+
+        <button
+          class="btn btn-save"
+          onclick="saveLocal()"
+        >
+          💾 Сақлаш
+        </button>
+
+        <button
+          class="btn btn-send"
+          onclick="sendReport()"
+        >
+          📤 Ҳисоботни жўнатиш
+        </button>
+
+      </div>
+
+    </div>
+    `
+  );
+
+}
+
+
+// ======================================================
+// УСКУНАЛАРНИ ЧИЗИШ
+// ======================================================
+
+function renderEquipment(){
+
+  const box =
+    document.getElementById("equipment");
+
+  let number = 0;
+
+  groups.forEach(group=>{
+
+    const groupItems = group[1];
+
+    let rows = "";
+
+    groupItems.forEach(name=>{
+
+      number++;
+
+      rows += itemHTML(
+        number,
+        name
+      );
+
+    });
+
+    box.insertAdjacentHTML(
+      "beforeend",
+
+      `
+      <div class="group">
+
+        <div class="group-head">
+
+          <div class="group-name">
+            ${group[0]}
+          </div>
+
+          <div class="count">
+            ${groupItems.length}
+          </div>
+
+        </div>
+
+        ${rows}
+
+      </div>
+      `
+    );
+
+  });
+
+}
+
+
+// ======================================================
+// ҚИДИРУ
+// ======================================================
+
+function filterItems(){
+
+  const value =
+    document
+      .getElementById("search")
+      .value
+      .toLowerCase()
+      .trim();
+
+  document
+    .querySelectorAll(".item")
+    .forEach(el=>{
+
+      const name =
+        el
+          .querySelector(".item-name")
+          .textContent
+          .toLowerCase();
+
+      el.style.display =
+        !value || name.includes(value)
+          ? ""
+          : "none";
+
+    });
+
+}
+
+
+// ======================================================
+// ҲИСОБОТ ТАЙЁРЛАШ
+// ======================================================
+
+function buildReport(){
+
+  const lines = [];
+
+  lines.push(
+    "💧 AGNKS ТЕХНИК НАЗОРАТ"
+  );
+
+  lines.push(
+    `Сана: ${today()}`
+  );
+
+  lines.push(
+    "Назорат: 08:00 / 12:00 / 17:00"
+  );
+
+  lines.push("");
+
+  let okCount = 0;
+  let minorCount = 0;
+  let badCount = 0;
+
+  allItems.forEach((name,index)=>{
+
+    const id = index+1;
+    const s = state[id];
+
+    if(s.status==="ok"){
+
+      okCount++;
+
+      lines.push(
+        `🟢 ${id}. ${name}`
+      );
+
+    }
+
+    else if(s.status==="minor"){
+
+      minorCount++;
+
+      lines.push(
+        `🟡 ${id}. ${name}`
+      );
+
+      if(s.note){
+        lines.push(
+          `   Изоҳ: ${s.note}`
+        );
+      }
+
+    }
+
+    else if(s.status==="bad"){
+
+      badCount++;
+
+      lines.push(
+        `🔴 ${id}. ${name}`
+      );
+
+      if(s.reason){
+        lines.push(
+          `   Носозлик сабаби: ${s.reason}`
+        );
+      }
+
+      if(s.note){
+        lines.push(
+          `   Қўшимча изоҳ: ${s.note}`
+        );
+      }
+
+    }
+
+    else{
+
+      lines.push(
+        `⚪ ${id}. ${name} — ҳолат белгиланмаган`
+      );
+
+    }
+
+  });
+
+  lines.push("");
+
+  lines.push(
+    `Жами: ${allItems.length}`
+  );
+
+  lines.push(
+    `🟢 Соз: ${okCount}`
+  );
+
+  lines.push(
+    `🟡 Камчилик: ${minorCount}`
+  );
+
+  lines.push(
+    `🔴 Носоз: ${badCount}`
+  );
+
+  return lines.join("\n");
+
+}
+
+
+// ======================================================
+// ҲИСОБОТ ЮБОРИШ
+// ======================================================
+
+async function sendReport(){
+
+  const report =
+    buildReport();
+
+  if(!confirm(
+    "Ҳисоботни муҳандисга жўнатасизми?"
+  )){
+    return;
+  }
+
+  try{
+
+    const result =
+      await api(
+        "/api/send-report",
+        {
+          message:report
+        }
+      );
+
+    if(result.ok){
+
+      showMessage(
+        "success",
+        "✅ Ҳисобот муҳандисга юборилди."
+      );
+
+    }else{
+
+      showMessage(
+        "error",
+        result.error || "Юборишда хатолик."
+      );
+
+    }
+
+  }catch(error){
+
+    showMessage(
+      "error",
+      "❌ " + error.message
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// МУҲАНДИС ИНТЕРФЕЙСИ
+// ======================================================
+
+async function renderEngineer(me){
+
+  const app =
+    document.getElementById("app");
+
+  app.innerHTML = `
+
+  <div class="card user-card">
+
+    <div>
+
+      <div class="user-name">
+        👨‍🔧 ${me.name || "Муҳандис"}
+      </div>
+
+      <div class="role">
+        Роль: 👨‍🔧 Муҳандис
+      </div>
+
+    </div>
+
+    <div class="date">
+      ${today()}
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <div class="title">
+      📩 Машинистнинг охирги хабари
+    </div>
+
+    <div id="latestMessage">
+      ⏳ Юкланмоқда...
+    </div>
+
+  </div>
+
+  `;
+
+  try{
+
+    const result =
+      await api(
+        "/api/latest-machinist-message"
+      );
+
+    const box =
+      document.getElementById(
+        "latestMessage"
+      );
+
+    if(!result.message){
+
+      box.innerHTML = `
+        <div class="empty">
+          Ҳозирча машинистдан хабар йўқ.
+        </div>
+      `;
+
+      return;
+    }
+
+    const original =
+      result.message.text || "";
+
+    box.innerHTML = `
+
+      <div class="manager-box">
+
+        <div class="original">
+          ${escapeHtml(original)}
+        </div>
+
+        <div class="field">
+
+          <label>
+            Қўшимча изоҳ
+          </label>
+
+          <textarea
+            id="managerNote"
+            placeholder="Зарур бўлса, қўшимча изоҳ ёзинг..."
+          ></textarea>
+
+        </div>
+
+        <button
+          class="btn btn-send"
+          style="width:100%;margin-top:12px"
+          onclick="sendManager()"
+        >
+          👔 Раҳбарга хабар
+        </button>
+
+      </div>
+
+    `;
+
+  }catch(error){
+
+    document.getElementById(
+      "latestMessage"
+    ).innerHTML = `
+      <div class="error">
+        ${escapeHtml(error.message)}
+      </div>
+    `;
+
+  }
+
+}
+
+
+// ======================================================
+// РАҲБАРГА ЮБОРИШ
+// ======================================================
+
+async function sendManager(){
+
+  const note =
+    document
+      .getElementById("managerNote")
+      ?.value || "";
+
+  if(!confirm(
+    "Машинистнинг асл хабари раҳбарга юборилсинми?"
+  )){
+    return;
+  }
+
+  try{
+
+    const result =
+      await api(
+        "/api/send-to-manager",
+        {
+          note
+        }
+      );
+
+    if(result.ok){
+
+      showMessage(
+        "success",
+        "✅ Хабар раҳбарга юборилди."
+      );
+
+    }else{
+
+      showMessage(
+        "error",
+        result.error || "Юборишда хатолик."
+      );
+
+    }
+
+  }catch(error){
+
+    showMessage(
+      "error",
+      "❌ " + error.message
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// HTML ХАВФСИЗЛИГИ
+// ======================================================
+
+function escapeHtml(text){
+
+  return String(text)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+// ======================================================
+// ИШГА ТУШИРИШ
+// ======================================================
+
+async function boot(){
+
+  const app =
+    document.getElementById("app");
+
+  if(!initData){
+
+    app.innerHTML = `
+      <div class="card notice">
+        📱 Telegram Web App орқали очинг.
+        <br><br>
+        Браузерда тўғридан-тўғри очиш мумкин эмас.
+        <br><br>
+        Telegram ботда <b>/start</b> босинг.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  try{
+
+    const result =
+      await api(
+        "/api/me"
+      );
+
+    if(!result.ok){
+
+      throw new Error(
+        result.error ||
+        "Фойдаланувчи аниқланмади."
+      );
+
+    }
+
+    /*
+      server.js:
+      { ok:true, me:{...} }
+
+      Шунинг учун ме ни тўғридан-тўғри оламиз.
+    */
+
+    const me =
+      result.me ||
+      result.user ||
+      result.data?.me;
+
+    if(!me){
+
+      throw new Error(
+        "Фойдаланувчи маълумоти сервердан келмади."
+      );
+
+    }
+
+    if(me.role==="machinist"){
+
+      renderMachinist(me);
+
+    }
+
+    else if(me.role==="engineer"){
+
+      await renderEngineer(me);
+
+    }
+
+    else{
+
+      app.innerHTML = `
+        <div class="card notice">
+          ❌ Сизнинг ролиңиз аниқланмади.
+          <br><br>
+          Telegram ID рўйхатдан ўтказилиши керак.
+        </div>
+      `;
+
+    }
+
+  }catch(error){
+
+    app.innerHTML = `
+      <div class="card notice">
+
+        ❌ <b>Тизимда хатолик</b>
+
+        <br><br>
+
+        ${escapeHtml(error.message)}
+
+      </div>
+    `;
+
+  }
+
+}
+
 boot();
-</script></body></html>
+
+</script>
+
+</body>
+</html>
