@@ -223,7 +223,7 @@ async function sendToEngineer(){
   const operator=document.getElementById("operator").value;
   if(!operator){alert("Машинистни танланг");return;}
   engineerMessage();
-  const message=document.getElementById("message").value;
+ const message=document.getElementById("message").value.replace(/\\n/g,"\n");
   try{
     const res=await fetch("/api/send-report",{
       method:"POST",
