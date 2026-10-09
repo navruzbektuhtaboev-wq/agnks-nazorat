@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="uz-Cyrl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Техник журналлар · AGNKS NAZORAT</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+/* Layout: AGNKS Nazorat teal — brand header band, cards on pale bg, one column max 900px, table scrolls inside its card */
+:root {
+  --bg: #eef5f9; --surface: #ffffff; --sunken: #f7fafc; --chip: #edf5fa;
+  --brand: #1287b5; --on-brand: #ffffff; --brand-soft: #e8f2f7; --on-brand-soft: #17617e; --brand-tint: #eef9fd;
+  --ink: #17324a; --ink-muted: #506b7c; --ink-subtle: #607789; --ink-faint: #8295a2;
+  --border: #d9e6ed; --divider: #edf1f3;
+  --ok-bg: #eaf8ef; --ok: #19733c; --bad-bg: #fff0f0; --bad: #a52b2b; --warn-bg: #fff4e0; --warn: #8a5000;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --shadow: 0 4px 16px rgba(30, 70, 90, 0.08); --shadow-bar: 0 -4px 18px rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.band { background: var(--brand); color: var(--on-brand); padding: 18px 20px 22px; }
+.band-in { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2px; }
+.band h1 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: .02em; }
+.band p { margin: 0; font-size: 14px; font-weight: 600; opacity: .95; }
+.tohome { color: var(--on-brand); font-size: 13px; font-weight: 700; margin-top: 8px; }
+main { max-width: 900px; margin: 0 auto; padding-inline: 12px; padding-block: 14px 110px; display: flex; flex-direction: column; gap: 14px; }
+.card { background: var(--surface); border-radius: 24px; box-shadow: var(--shadow); padding: 18px; min-width: 0; }
+.notice { border-radius: 14px; padding: 12px 14px; font-weight: 600; font-size: 14px; }
+.notice.bad { background: var(--bad-bg); color: var(--bad); }
+.notice.ok { background: var(--ok-bg); color: var(--ok); }
+.pill { display: inline-block; border-radius: 20px; padding: 1px 9px; font-size: 12px; font-weight: 800; margin-top: 4px; }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill.warn { background: var(--warn-bg); color: var(--warn); }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.alerts h2, .staff h2 { font-size: 18px; font-weight: 800; margin: 0 0 10px; }
+.alert { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: baseline; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--divider); padding: 10px 0; }
+.alert:first-of-type { border-top: 0; }
+.alert .w { font-weight: 650; }
+.alert .s { display: block; font-size: 13px; color: var(--ink-subtle); }
+.homebar { display: flex; justify-content: flex-end; }
+.staff ul { list-style: none; margin: 0 0 12px; padding: 0; }
+.staff li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--divider); font-weight: 650; }
+.staff li:first-child { border-top: 0; }
+.addrow { display: flex; gap: 8px; }
+.list { background: var(--surface); border-radius: 24px; box-shadow: var(--shadow); overflow: hidden; }
+.row { display: grid; grid-template-columns: 52px 1fr auto 14px; gap: 12px; align-items: center; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--divider); padding: 14px 18px; }
+.row:last-child { border-bottom: 0; }
+.row:hover { background: var(--sunken); }
+.badge { background: var(--brand); color: var(--on-brand); border-radius: 14px; height: 40px; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+.row .t { font-size: 16px; font-weight: 650; line-height: 1.3; text-wrap: balance; }
+.count { background: var(--chip); color: var(--on-brand-soft); border-radius: 20px; padding: 2px 10px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.arrow { color: var(--ink-faint); font-weight: 700; }
+.top { display: flex; gap: 12px; align-items: flex-start; }
+.back { background: var(--brand-soft); color: var(--on-brand-soft); border: 0; border-radius: 14px; padding: 8px 14px; font-weight: 700; flex: none; }
+.top h2 { font-size: 19px; font-weight: 800; margin: 0; line-height: 1.3; text-wrap: balance; }
+.top .no { font-size: 14px; font-weight: 700; color: var(--ink-subtle); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+.tools label { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+select, input, textarea { background: var(--surface); border: 2px solid var(--border); border-radius: 14px; padding: 9px 12px; font-size: 16px; min-width: 0; width: 100%; }
+.tools select { width: auto; }
+.btn { border: 0; border-radius: 15px; padding: 11px 16px; font-weight: 800; font-size: 14px; letter-spacing: .02em; }
+.btn.primary { background: var(--brand); color: var(--on-brand); }
+.btn.soft { background: var(--brand-soft); color: var(--on-brand-soft); }
+.btn.danger { background: var(--bad-bg); color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: default; }
+.tablewrap { overflow-x: auto; margin-inline: -18px; padding-inline: 18px; }
+table { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; vertical-align: middle; }
+th { background: var(--sunken); font-weight: 700; color: var(--ink); text-align: center; line-height: 1.25; }
+td { font-variant-numeric: tabular-nums; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--brand-tint); }
+td.c { text-align: center; }
+.empty { color: var(--ink-subtle); text-align: center; padding: 26px 8px; font-size: 15px; }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--surface); box-shadow: var(--shadow-bar); padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.bar-in { max-width: 900px; margin: 0 auto; display: flex; gap: 8px; }
+.bar .btn { flex: 1; padding-block: 14px; }
+/* form sheet */
+.sheet { position: fixed; inset: 0; background: rgba(23, 50, 74, .45); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+.sheet-in { background: var(--bg); width: 100%; max-width: 640px; max-height: 92%; overflow-y: auto; border-radius: 24px 24px 0 0; padding: 18px 12px calc(18px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 700px) { .sheet { align-items: center; } .sheet-in { border-radius: 24px; } }
+.sheet h3 { margin: 0 6px; font-size: 19px; font-weight: 800; }
+fieldset { border: 0; margin: 0; padding: 16px 18px; background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); min-width: 0; }
+legend { float: left; width: 100%; font-weight: 800; font-size: 15px; padding: 0; grid-column: 1 / -1; }
+.f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.f.wide { grid-column: 1 / -1; }
+.f > span { font-size: 14px; font-weight: 700; color: var(--ink-muted); }
+.hours { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 6px; }
+.hours button { border: 2px solid var(--border); background: var(--surface); border-radius: 12px; padding: 8px 0; font-weight: 700; font-variant-numeric: tabular-nums; }
+.hours button[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-tint); color: var(--on-brand-soft); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.actions .btn { flex: 1; }
+.meta { font-size: 13px; color: var(--ink-subtle); margin: 0 6px; }
+</style>
+</head>
+<body>
+
+<header class="band"><div class="band-in"><h1>АГТКШ-1 ЖУРНАЛЛАР</h1><p>«Равнак Омад Метан» МЧЖ · техник журналларни юритиш</p><a class="tohome" href="/">← AGNKS назоратга қайтиш</a></div></header>
+<main id="app"></main>
+<div class="bar" id="bar" hidden><div class="bar-in" id="barIn"></div></div>
+<div class="sheet" id="sheet" hidden><div class="sheet-in" id="sheetIn" role="dialog" aria-modal="true"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const ORG = "«Равнак Омад Метан» МЧЖ · АГТКШ-1";
+const HOL = ["Соз", "Носоз"];
+const F = (k, t, type = "text", x = {}) => ({ k, t, type, w: 12, ...x });
+const G = (t, cols) => ({ g: t, cols });
+const DRILL_ITEMS = ["Газ тозалаш қурилмаси", "Сепаратор", "Компрессор киришидаги фильтр", "Компрессор 1, 2, 3, 4-босқичлари", "Газ қуритиш қурилмаси ва мой ажратгичлар", "Газ сақлаш аккумулятори", "Продувка сиғимлари"];
+const MONTHS = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const HOURS = [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,1,2,3,4,5,6,7];
+
+const J = [
+  { id: "16d", no: "16д", orient: "landscape", title: "Газ қувурлари, бошқарув ва хавфсизлик арматуралари ҳамда клапанларнинг техник ҳолатини ойлик кўрикдан ўтказиш журнали", cols: [
+    F("date", "Сана", "date", { w: 11 }),
+    G("Газ қувури", [F("uch", "Схема бўйича участка рақами"), F("uchH", "Ҳолати", "sel", { opts: HOL, w: 9 }), F("fl", "Фланец рақами", "text", { w: 10 }), F("flH", "Ҳолати", "sel", { opts: HOL, w: 9 })]),
+    G("Вентил ва задвижкалар", [F("ven", "Техник схема бўйича рақами"), F("venH", "Ҳолати", "sel", { opts: HOL, w: 9 })]),
+    G("Сақлагич клапанлар", [F("kl", "Техник схема бўйича рақами"), F("klH", "Ҳолати", "sel", { opts: HOL, w: 9 })]),
+    G("Кўрикни ўтказди", [F("fish", "Ф.И.Ш.", "text", { w: 16 }), F("sig", "Имзо", "sign", { w: 9 })]) ] },
+  { id: "10", no: "10", orient: "landscape", title: "Ёнғин хавфсизлиги ускуналарини кўрикдан ўтказиш ва текшириш журнали", cols: [
+    F("n", "№", "no", { w: 5 }), F("name", "Ёнғинга қарши ускунанинг номи", "text", { w: 24 }), F("cnt", "Сони", "num", { w: 7 }),
+    F("inv", "Инвентар рақами", "text", { w: 11 }), F("per", "Текшириш даврийлиги", "text", { w: 12 }), F("date", "Текшириш санаси", "date", { w: 11 }),
+    F("res", "Кўрик ёки синов натижаси", "text", { w: 18 }), F("next", "Навбатдаги текшириш санаси", "date", { w: 11 }),
+    F("fish", "Текширган шахснинг Ф.И.Ш.", "text", { w: 18 }), F("sig", "Имзо", "sign", { w: 9 }), F("note", "Изоҳ", "text", { w: 11 }) ] },
+  { id: "15", no: "15", orient: "portrait", title: "Компрессор бўлимидаги техник ускуналар ва газ қувурларининг герметиклигини текшириш журнали", cols: [
+    F("date", "Сана", "date", { w: 10 }), F("uz", "Тугунлар, туташувлар ва бирикмаларнинг номи", "long", { w: 22 }),
+    F("usul", "Газ сизиб чиқишини аниқлаш усули", "sel", { opts: ["Совун эритмаси", "Газ анализатори", "Кўз билан кўрик"], w: 13 }),
+    F("leak", "Аниқланган газ сизиб чиқишлари", "text", { w: 13 }), F("fix", "Газ сизиб чиқиши бартараф этилгани ҳақида белги", "text", { w: 15 }),
+    G("Текширувчи", [F("fish", "Ф.И.Ш.", "text", { w: 14 }), F("sig", "Имзо", "sign", { w: 9 })]) ] },
+  { id: "chiller", no: "", orient: "portrait", title: "Чиллер ускунасининг иш жараёнини қайд этиш журнали", cols: [
+    F("date", "Сана", "date", { w: 11 }), F("fish", "Навбатчи машинистнинг Ф.И.Ш.", "text", { w: 20 }),
+    G("Чиллер", [F("on", "Ишга туширилган вақт", "time", { w: 11 }), F("off", "Тўхтатилган вақт", "time", { w: 11 })]),
+    G("Ҳарорат, °C", [F("tg", "Газ", "num", { w: 9 }), F("ta", "Антифриз", "num", { w: 9 })]),
+    F("sig", "Навбатчи имзоси", "sign", { w: 11 }) ] },
+  { id: "drill", no: "", orient: "landscape", small: true, title: "Авария ва ёнғинга қарши машғулотларни ўтказиш жадвали", cols: [
+    F("n", "№", "no", { w: 4 }), F("tur", "Авария тури", "sel", { opts: ["Авария", "Ёнғин"], w: 8 }),
+    F("mavzu", "Машғулот мавзуси", "long", { w: 30 }), F("mas", "Масъул", "text", { w: 18 }),
+    G("Ўтказилган сана (ой бўйича)", MONTHS.map((m, i) => F("m" + (i + 1), m, "text", { w: 7 }))) ] },
+  { id: "produvka", no: "", orient: "landscape", small: true, title: "Жиҳозларни продувкадан ўтказиш журнали", cols: [
+    F("date", "Сана", "date", { w: 9 }), F("item", "Жиҳоз номи", "sel", { opts: DRILL_ITEMS, w: 22 }),
+    F("hours", "Продувка ўтказилган соатлар", "hours"),
+    F("fish", "Навбатчи машинист Ф.И.Ш.", "text", { w: 15 }), F("sig", "Имзо", "sign", { w: 8 }) ] },
+  { id: "quritish", no: "", orient: "landscape", title: "Газ қуритиш блокининг иш жараёнини қайд этиш журнали", cols: [
+    F("date", "Сана", "date", { w: 10 }),
+    G("Иш режими", [F("qur", "Қуритиш", "text", { w: 9 }), F("reg", "Регенерация (тикланиш)", "text", { w: 10 })]),
+    F("isit", "Иситиш қурилмасидаги ҳарорат, °C", "num", { w: 10 }),
+    G("Газни қуритиш ҳарорати, °C", [F("tmax", "Энг юқори", "num", { w: 8 }), F("tmin", "Энг паст", "num", { w: 8 })]),
+    F("tout", "Газнинг колонкага чиқиш ҳарорати, °C", "num", { w: 10 }), F("dew", "Газнинг шудринг нуқтаси, °C", "num", { w: 10 }),
+    F("hg", "Колонкага чиқишдаги намлик, г/м³", "num", { w: 10 }), F("hp", "Колонкага чиқишдаги намлик, %", "num", { w: 9 }),
+    F("prod", "Продувка қилинган вақт", "time", { w: 9 }),
+    G("Навбатчи машинист", [F("fish", "Ф.И.Ш.", "text", { w: 15 }), F("sig", "Имзо", "sign", { w: 8 })]) ] },
+  { id: "21", no: "21", orient: "landscape", title: "Ишчи манометрларни назорат манометри билан текшириш журнали", cols: [
+    F("n", "№", "no", { w: 4 }), F("date", "Текшириш санаси", "date", { w: 10 }),
+    G("Ишчи манометр ҳақида маълумот", [F("joy", "Ўрнатилган жойи", "text", { w: 17 }), F("zav", "Завод рақами", "text", { w: 10 }), F("klass", "Аниқлик синфи", "text", { w: 8 }), F("pred", "Ўлчаш чегараси", "text", { w: 9 })]),
+    F("kn", "Назорат манометрининг рақами", "text", { w: 10 }),
+    G("Манометр кўрсаткичи, кгс/см²", [F("pt", "Текширилаётган", "num", { w: 11 }), F("pk", "Назорат", "num", { w: 9 })]),
+    F("xul", "Хулоса", "sel", { opts: ["Яроқли", "Яроқсиз"], w: 9 }),
+    F("fish", "Текширувни ўтказган шахснинг Ф.И.Ш. ва лавозими", "text", { w: 18 }), F("sig", "Имзо", "sign", { w: 8 }) ] },
+  { id: "3b", no: "", orient: "landscape", title: "Меҳнатни муҳофаза қилиш бўйича 3 босқичли назорат журнали", cols: [
+    F("n", "№", "no", { w: 4 }), F("date", "Назорат ўтказилган сана", "date", { w: 10 }),
+    F("buz", "Хавфсизлик техникаси ва меҳнатни муҳофаза қилиш қоидалари талаблари бузилган ҳолатлар", "long", { w: 28 }),
+    F("tad", "Камчилик ва нуқсонларни бартараф этиш тадбирлари", "long", { w: 24 }), F("mud", "Бажариш муддати", "date", { w: 10 }),
+    F("baj", "Бажарувчи масъул шахснинг Ф.И.Ш.", "text", { w: 15 }), F("tek", "Текширувни ўтказган шахснинг Ф.И.Ш. ва лавозими", "text", { w: 16 }),
+    G("Имзолар", [F("s1", "Текширувчи", "sign", { w: 9 }), F("s2", "Бажарувчи", "sign", { w: 9 })]) ] },
+];
+const byId = Object.fromEntries(J.map(j => [j.id, j]));
+
+// leaf columns; for export the hours field expands into 24 hour columns
+function leaves(j) { const out = []; for (const c of j.cols) (c.g ? c.cols : [c]).forEach(x => out.push(x)); return out; }
+function exportTree(j) {
+  return j.cols.map(c => c.type === "hours" ? G(c.t, HOURS.map(h => F(c.k + ":" + h, String(h), "hourcell", { w: 3.2 }))) : c);
+}
+const hasGroups = tree => tree.some(c => c.g);
+
+// ---------- state ----------
+let db = null, dl = true, me = null, canWrite = false, entries = [], loaded = false, dbError = "", staff = [];
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+const initData = tg?.initData || "";
+async function api(url, body = {}) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, initData }) });
+  let data; try { data = await r.json(); } catch (e) { throw new Error("Сервердан нотўғри жавоб келди."); }
+  if (!r.ok || !data.ok) throw new Error(data.error || "Сервер хатоси.");
+  return data;
+}
+const PERSON = new Set(["fish", "baj", "tek", "mas"]);
+let view = { j: null, month: "all" };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const today = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+const fmtDate = s => /^\d{4}-\d{2}-\d{2}$/.test(s || "") ? s.slice(8, 10) + "." + s.slice(5, 7) + "." + s.slice(0, 4) : (s || "");
+const monthName = ym => MONTHS[+ym.slice(5, 7) - 1] + " " + ym.slice(0, 4);
+
+function cellText(f, v, idx) {
+  if (f.type === "no") return String(idx + 1);
+  if (f.type === "date") return fmtDate(v);
+  if (f.type === "hours") return (v || []).join(", ");
+  if (f.type === "sign") return "";
+  return v ?? "";
+}
+function journalEntries(jid) {
+  const list = entries.filter(e => e.j === jid);
+  list.sort((a, b) => (a.d || "").localeCompare(b.d || "") || (a.at || 0) - (b.at || 0));
+  return list;
+}
+function filtered(jid) {
+  const list = journalEntries(jid);
+  return view.month === "all" ? list : list.filter(e => (e.d || "").startsWith(view.month));
+}
+
+// ---------- render ----------
+function render() {
+  const app = $("#app");
+  if (!view.j) { renderHome(app); return; }
+  renderJournal(app, byId[view.j]);
+}
+function banner() {
+  if (dbError) return `<div class="notice bad">${esc(dbError)}</div>`;
+  return "";
+}
+// ---------- reminders ----------
+const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+const DAILY = ["chiller", "quritish", "produvka"];
+function reminders() {
+  const t = today(), ym = t.slice(0, 7), out = [];
+  // 16д: ойлик кўрик
+  const g = journalEntries("16d");
+  if (!g.some(e => (e.d || "").startsWith(ym))) {
+    const last = g.length ? g[g.length - 1].d : "";
+    out.push({ j: "16d", lvl: +t.slice(8, 10) > 25 ? "bad" : "warn", what: "Бу ойлик кўрик ҳали ўтказилмаган", sub: last ? "Охирги кўрик: " + fmtDate(last) : "Ҳали битта ҳам кўрик ёзилмаган" });
+  }
+  // 10: навбатдаги текшириш санаси
+  const latest = {};
+  for (const e of journalEntries("10")) { const k = ((e.v?.name || "") + "|" + (e.v?.inv || "")).toLowerCase(); latest[k] = e; }
+  for (const e of Object.values(latest)) {
+    const nx = e.v?.next; if (!nx) continue;
+    const d = daysBetween(t, nx), nm = e.v.name + (e.v.inv ? " (инв. " + e.v.inv + ")" : "");
+    if (d < 0) out.push({ j: "10", lvl: "bad", what: nm + ": текшириш муддати ўтган", sub: "Муддат: " + fmtDate(nx) + ", " + -d + " кун кечикди" });
+    else if (d <= 7) out.push({ j: "10", lvl: "warn", what: nm + ": текшириш яқинлашди", sub: "Муддат: " + fmtDate(nx) + (d ? ", " + d + " кун қолди" : ", бугун") });
+  }
+  // кунлик журналлар: ишлатилаётган бўлса, бугун ёзилганми
+  for (const id of DAILY) {
+    const l = journalEntries(id); if (!l.length) continue;
+    if (!l.some(e => e.d === t)) out.push({ j: id, lvl: "warn", what: byId[id].title.replace(/ журнали$/, "") + ": бугун ёзилмаган", sub: "Охирги ёзув: " + fmtDate(l[l.length - 1].d) });
+  }
+  return out.sort((a, b) => (a.lvl === "bad" ? 0 : 1) - (b.lvl === "bad" ? 0 : 1));
+}
+function renderHome(app) {
+  $("#bar").hidden = true;
+  const rem = loaded && db ? reminders() : [];
+  const byJ = {}; rem.forEach(r => { if (!byJ[r.j] || r.lvl === "bad") byJ[r.j] = r.lvl; });
+  const rows = J.map(j => {
+    const n = entries.filter(e => e.j === j.id).length, st = byJ[j.id];
+    const pill = st ? `<br><span class="pill ${st}">${st === "bad" ? "Кечикди" : "Эътибор беринг"}</span>` : "";
+    return `<button class="row" data-open="${j.id}"><span class="badge">${esc(j.no || "—")}</span><span class="t">${esc(j.title)}${pill}</span><span class="count">${loaded ? n : "…"}</span><span class="arrow">▸</span></button>`;
+  }).join("");
+  const al = !loaded || !db ? "" : `<section class="card alerts"><h2>Эслатмалар</h2>${rem.length ? rem.map(r => `<button class="alert" data-open="${r.j}"><span class="pill ${r.lvl}">${r.lvl === "bad" ? "Кечикди" : "Эслатма"}</span><span><span class="w">${esc(r.what)}</span><span class="s">${esc(r.sub)}</span></span></button>`).join("") : `<span class="pill ok">Ҳаммаси жойида</span> <span class="s" style="color:var(--ink-subtle);font-size:14px">Кечиккан кўрик ёки текширув йўқ.</span>`}</section>`;
+  app.innerHTML = banner() + al + `<div class="list">${rows}</div>` + (me ? `<p class="meta">${esc(me.name)} · ${canWrite ? "ёзиш мумкин" : "фақат кўриш"}</p>` : "");
+}
+function renderJournal(app, j) {
+  const all = journalEntries(j.id);
+  const months = [...new Set(all.map(e => (e.d || "").slice(0, 7)).filter(Boolean))].sort().reverse();
+  if (view.month !== "all" && !months.includes(view.month)) view.month = "all";
+  const list = filtered(j.id);
+  const ls = leaves(j);
+  const tree = j.cols;
+  const two = hasGroups(tree);
+  let h1 = "", h2 = "";
+  for (const c of tree) {
+    if (c.g) { h1 += `<th colspan="${c.cols.length}">${esc(c.g)}</th>`; c.cols.forEach(x => h2 += `<th>${esc(x.t)}</th>`); }
+    else h1 += `<th${two ? ' rowspan="2"' : ""}>${esc(c.t)}</th>`;
+  }
+  const body = list.map((e, i) => `<tr data-edit="${esc(e.id)}">${ls.map(f => {
+    const v = f.type === "sign" ? (e.v?.[f.k] ? "✓" : "") : cellText(f, e.v?.[f.k], i);
+    const c = ["no", "date", "time", "num", "sel", "sign"].includes(f.type) ? ' class="c"' : "";
+    return `<td${c}>${esc(v)}</td>`;
+  }).join("")}</tr>`).join("");
+  const emptyText = !loaded ? "Ёзувлар юкланмоқда…" : (canWrite ? "Ҳали ёзув йўқ. Пастдаги «ЁЗУВ ҚЎШИШ» тугмасини босинг." : "Ҳали ёзув йўқ.");
+  app.innerHTML = banner() + `<section class="card">
+    <div class="top"><button class="back" data-home>← Орқага</button><div><div class="no">${j.no ? "Журнал № " + esc(j.no) : "Журнал"}</div><h2>${esc(j.title)}</h2></div></div>
+    <div class="tools">
+      <label for="month">Давр</label>
+      <select id="month"><option value="all">Ҳаммаси (${all.length})</option>${months.map(m => `<option value="${m}"${m === view.month ? " selected" : ""}>${monthName(m)}</option>`).join("")}</select>
+      ${dl ? `<button class="btn soft" data-x="xlsx" ${list.length ? "" : "disabled"}>EXCEL</button><button class="btn soft" data-x="pdf" ${list.length ? "" : "disabled"}>PDF</button><button class="btn soft" data-x="blank">БЎШ БЛАНКА</button>` : ""}
+    </div>
+  </section>
+  <section class="card"><div class="tablewrap"><table><thead><tr>${h1}</tr>${two ? `<tr>${h2}</tr>` : ""}</thead>
+  <tbody>${body}</tbody></table></div>${list.length ? "" : `<div class="empty">${emptyText}</div>`}</section>
+  <p class="meta">EXCEL ва PDF файллар Telegram чатингизга бот орқали юборилади.</p>`;
+  const bar = $("#bar"); bar.hidden = !canWrite;
+  $("#barIn").innerHTML = `<button class="btn primary" data-new>+ ЁЗУВ ҚЎШИШ</button>`;
+}
+
+// ---------- form ----------
+function openForm(j, entry) {
+  const v = { ...(entry?.v || {}) };
+  if (!entry) { for (const f of leaves(j)) { if (f.type === "date" && f.k === "date") v[f.k] = today(); if (f.k === "fish" && me?.name) v[f.k] = me.name; } }
+  const field = f => {
+    const id = "f_" + f.k, val = v[f.k] ?? "";
+    if (f.type === "no") return "";
+    if (f.type === "sign") return `<label class="f"><span>${esc(f.t)}</span><select id="${id}"><option value="">Имзоланмаган</option><option value="1"${val ? " selected" : ""}>Имзоланди ✓</option></select></label>`;
+    if (f.type === "sel") return `<label class="f"><span>${esc(f.t)}</span><select id="${id}"><option value=""></option>${f.opts.map(o => `<option${o === val ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></label>`;
+    if (f.type === "long") return `<label class="f wide"><span>${esc(f.t)}</span><textarea id="${id}" rows="3">${esc(val)}</textarea></label>`;
+    if (f.type === "hours") { const on = new Set(val || []); return `<div class="f wide"><span>${esc(f.t)}</span><div class="hours" id="${id}">${HOURS.map(h => `<button type="button" data-h="${h}" aria-pressed="${on.has(h)}">${h}</button>`).join("")}</div></div>`; }
+    const t = { date: "date", time: "time", num: "text" }[f.type] || "text";
+    const im = f.type === "num" ? ' inputmode="decimal"' : "";
+    const ls = PERSON.has(f.k) && staff.length ? ' list="staffList" autocomplete="off"' : "";
+    return `<label class="f${f.t.length > 40 ? " wide" : ""}"><span>${esc(f.t)}</span><input id="${id}" type="${t}"${im}${ls} value="${esc(val)}"></label>`;
+  };
+  const plain = j.cols.filter(c => !c.g).map(field).join("");
+  const groups = j.cols.filter(c => c.g).map(c => `<fieldset><legend>${esc(c.g)}</legend>${c.cols.map(field).join("")}</fieldset>`).join("");
+  $("#sheetIn").innerHTML = `<datalist id="staffList">${staff.map(n => `<option value="${esc(n)}"></option>`).join("")}</datalist><h3>${entry ? "Ёзувни таҳрирлаш" : "Янги ёзув"}</h3>
+    <form id="form" style="display:flex;flex-direction:column;gap:12px">
+      ${plain ? `<fieldset>${plain}</fieldset>` : ""}${groups}
+      <div id="formMsg"></div>
+      <div class="actions">
+        <button type="button" class="btn soft" data-close>БЕКОР ҚИЛИШ</button>
+        ${entry ? `<button type="button" class="btn danger" data-del="${esc(entry.id)}">ЎЧИРИШ</button>` : ""}
+        <button type="submit" class="btn primary">САҚЛАШ</button>
+      </div>
+    </form>`;
+  $("#sheet").hidden = false;
+  $("#sheetIn").scrollTop = 0;
+  $("#form").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const out = {};
+    for (const f of leaves(j)) {
+      if (f.type === "no") continue;
+      if (f.type === "hours") { out[f.k] = [...document.querySelectorAll(`#f_${f.k} button[aria-pressed="true"]`)].map(b => +b.dataset.h); continue; }
+      const el = document.getElementById("f_" + f.k); const val = el.value.trim();
+      if (val) out[f.k] = val;
+    }
+    const d = out.date || out.m1 || "";
+    const msg = $("#formMsg");
+    if (j.cols.some(c => c.k === "date") && !out.date) { msg.innerHTML = `<div class="notice bad">Санани киритинг.</div>`; return; }
+    const btn = ev.submitter; if (btn) btn.disabled = true;
+    try {
+      await api("/api/journals/save", { entry: { id: entry?.id, j: j.id, d: out.date || entry?.d || "", v: out } });
+      closeForm();
+      await refresh();
+    } catch (e) {
+      msg.innerHTML = `<div class="notice bad">${esc(e.message || "Сақланмади. Интернетни текшириб, қайта уриниб кўринг.")}</div>`;
+      if (btn) btn.disabled = false;
+    }
+  });
+}
+function closeForm() { $("#sheet").hidden = true; $("#sheetIn").innerHTML = ""; }
+
+// ---------- export ----------
+function headerRows(j) {
+  const tree = exportTree(j), two = hasGroups(tree), r1 = [], r2 = [];
+  for (const c of tree) {
+    if (c.g) { c.cols.forEach((x, i) => { r1.push(i === 0 ? { t: c.g, cs: c.cols.length } : null); r2.push({ t: x.t }); }); }
+    else { r1.push({ t: c.t, rs: two ? 2 : 1 }); r2.push(null); }
+  }
+  return two ? [r1, r2] : [r1];
+}
+function exportLeaves(j) { const out = []; for (const c of exportTree(j)) (c.g ? c.cols : [c]).forEach(x => out.push(x)); return out; }
+function rowValues(j, e, i) {
+  return exportLeaves(j).map(f => {
+    if (f.type === "hourcell") { const [k, h] = f.k.split(":"); return (e.v?.[k] || []).includes(+h) ? "+" : ""; }
+    return cellText(f, e.v?.[f.k], i);
+  });
+}
+function periodText(list) {
+  if (view.month !== "all") return "Давр: " + monthName(view.month);
+  const ds = list.map(e => e.d).filter(Boolean).sort();
+  return ds.length ? "Бошланган сана: " + fmtDate(ds[0]) + "        Тугаган сана: " + fmtDate(ds[ds.length - 1]) : "";
+}
+const BLANK_PERIOD = "Бошланган сана: «___» ____________ 20___ й.        Тугаган сана: «___» ____________ 20___ й.";
+function fileBase(j) { return (j.no ? j.no + "_" : "") + j.title.replace(/ журнали$| жадвали$/, "").replace(/[^\p{L}\p{N}]+/gu, "_").slice(0, 60); }
+
+function toBase64(bytes) {
+  let bin = ""; for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+async function save(filename, data) {
+  try {
+    const bytes = data instanceof Blob ? new Uint8Array(await data.arrayBuffer()) : data;
+    await api("/api/journals/send-file", { filename, data: toBase64(bytes), caption: byId[view.j].title });
+    alertMsg("Файл Telegram чатингизга юборилди.", "ok");
+  } catch (e) { alertMsg(e.message || "Файл юборилмади."); }
+}
+function alertMsg(t, kind = "bad") { const n = document.createElement("div"); n.className = "notice " + kind; n.textContent = t; $("#app").prepend(n); window.scrollTo(0, 0); setTimeout(() => n.remove(), 5000); }
+
+function exportPdf(j, list, blank) {
+  const land = j.orient === "landscape", pageW = (land ? 842 : 595) - 56;
+  const ls = exportLeaves(j), tot = ls.reduce((s, f) => s + f.w, 0);
+  const widths = ls.map(f => f.w / tot * pageW - 8.2);
+  const fs = j.small ? 7.5 : 8.5;
+  const hdr = headerRows(j).map(r => r.map(c => c ? { text: c.t, bold: true, alignment: "center", fillColor: "#e7e6e6", fontSize: fs, ...(c.cs ? { colSpan: c.cs } : {}), ...(c.rs > 1 ? { rowSpan: c.rs } : {}) } : {}));
+  const nums = ls.map((_, i) => ({ text: String(i + 1), italics: true, fontSize: 7, alignment: "center" }));
+  const rows = blank ? Array.from({ length: land ? 16 : 26 }, () => ls.map(() => ({ text: " ", fontSize: fs + 4 })))
+    : list.map((e, i) => rowValues(j, e, i).map((v, k) => ({ text: String(v), fontSize: fs, alignment: ["text", "long"].includes(ls[k].type) ? "left" : "center" })));
+  const doc = {
+    pageSize: "A4", pageOrientation: land ? "landscape" : "portrait", pageMargins: [28, 28, 28, 34],
+    footer: (p) => ({ text: "Варақ " + p, alignment: "center", fontSize: 8, margin: [0, 10, 0, 0] }),
+    content: [
+      { columns: [{ text: ORG, italics: true, fontSize: 9 }, { text: "Журнал № " + (j.no || "_____"), bold: true, fontSize: 9, alignment: "right" }] },
+      { text: j.title, bold: true, fontSize: 13, alignment: "center", margin: [40, 12, 40, 4] },
+      { text: blank ? BLANK_PERIOD : periodText(list), fontSize: 9, alignment: "center", margin: [0, 0, 0, 8] },
+      { table: { headerRows: hdr.length + 1, widths, body: [...hdr, nums, ...rows], dontBreakRows: true }, layout: { hLineWidth: () => .6, vLineWidth: () => .6, paddingLeft: () => 3, paddingRight: () => 3 } },
+    ],
+    defaultStyle: { font: "Roboto" },
+  };
+  return new Promise(res => pdfMake.createPdf(doc).getBlob(b => res(b)));
+}
+function exportXlsx(j, list, blank) {
+  const ls = exportLeaves(j), n = ls.length, hr = headerRows(j);
+  const aoa = [[ORG, ...Array(n - 2).fill(""), "Журнал № " + (j.no || "_____")], [j.title], [blank ? BLANK_PERIOD : periodText(list)], []];
+  const merges = [{ s: { r: 1, c: 0 }, e: { r: 1, c: n - 1 } }, { s: { r: 2, c: 0 }, e: { r: 2, c: n - 1 } }];
+  const h0 = aoa.length;
+  hr.forEach((r, ri) => {
+    aoa.push(r.map(c => c ? c.t : ""));
+    r.forEach((c, ci) => { if (c && (c.cs > 1 || c.rs > 1)) merges.push({ s: { r: h0 + ri, c: ci }, e: { r: h0 + ri + (c.rs || 1) - 1, c: ci + (c.cs || 1) - 1 } }); });
+  });
+  aoa.push(ls.map((_, i) => i + 1));
+  if (blank) for (let i = 0; i < 40; i++) aoa.push(Array(n).fill(""));
+  else list.forEach((e, i) => aoa.push(rowValues(j, e, i)));
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws["!merges"] = merges;
+  ws["!cols"] = ls.map(f => ({ wch: Math.round(f.w * 1.3) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, (j.no || j.id).slice(0, 30));
+  return new Uint8Array(XLSX.write(wb, { bookType: "xlsx", type: "array" }));
+}
+async function doExport(kind) {
+  const j = byId[view.j], list = filtered(j.id);
+  const suffix = view.month === "all" ? "" : "_" + view.month;
+  if (kind === "xlsx") return save(fileBase(j) + suffix + ".xlsx", exportXlsx(j, list, false));
+  if (kind === "pdf") return save(fileBase(j) + suffix + ".pdf", await exportPdf(j, list, false));
+  if (kind === "blank") return save(fileBase(j) + "_бланка.pdf", await exportPdf(j, [], true));
+}
+
+// ---------- events ----------
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, tr[data-edit]"); if (!t) return;
+  if (t.dataset.open) { view = { j: t.dataset.open, month: "all" }; render(); window.scrollTo(0, 0); }
+  else if (t.hasAttribute("data-home")) { view.j = null; render(); }
+  else if (t.hasAttribute("data-new")) openForm(byId[view.j]);
+  else if (t.dataset.edit) { const en = entries.find(x => x.id === t.dataset.edit); if (en && canWrite) openForm(byId[view.j], en); }
+  else if (t.hasAttribute("data-close")) closeForm();
+  else if (t.dataset.h) t.setAttribute("aria-pressed", t.getAttribute("aria-pressed") !== "true");
+  else if (t.dataset.del) {
+    if (t.dataset.sure) { api("/api/journals/delete", { id: t.dataset.del }).then(() => { closeForm(); return refresh(); }).catch(err => { $("#formMsg").innerHTML = `<div class="notice bad">${esc(err.message)}</div>`; }); }
+    else { t.dataset.sure = "1"; t.textContent = "ЎЧИРИШНИ ТАСДИҚЛАНГ"; }
+  }
+  else if (t.dataset.x) { t.disabled = true; doExport(t.dataset.x).finally(() => { t.disabled = false; }); }
+});
+document.addEventListener("change", e => { if (e.target.id === "month") { view.month = e.target.value; render(); } });
+$("#sheet").addEventListener("click", e => { if (e.target.id === "sheet") closeForm(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#sheet").hidden) closeForm(); });
+
+render();
+async function refresh() {
+  const r = await api("/api/journals/entries");
+  me = r.me; canWrite = !!r.canWrite; db = true;
+  staff = [...new Set([...(r.staff || []), me?.name].filter(Boolean))];
+  entries = r.entries || []; loaded = true; dbError = ""; render();
+}
+(async () => {
+  if (!initData) { dbError = "Журналларни Telegram бот орқали очинг: ботда /start босинг."; loaded = true; render(); return; }
+  try { await refresh(); }
+  catch (e) { dbError = e.message || "Ёзувлар юкланмади."; loaded = true; render(); }
+})();
+</script>
+</body>
+</html>
