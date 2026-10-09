@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const path = require('path');
+const journals = require('./journals-store');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +28,11 @@ const MACHINISTS = [
 
 let latestMachinistMessage = null;
 
-app.use(express.json({ limit: '200kb' }));
+// Файл юбориш (PDF/Excel) каттароқ бўлгани учун алоҳида чегара билан ўқилади
+const smallJson = express.json({ limit: '200kb' });
+app.use((req, res, next) =>
+  req.path === '/api/journals/send-file' ? next() : smallJson(req, res, next)
+);
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -204,6 +209,14 @@ app.post('/telegram/webhook', async (req, res) => {
                   text: '📋 AGNKS назоратни очиш',
                   web_app: {
                     url: WEB_APP_URL
+                  }
+                }
+              ],
+              [
+                {
+                  text: '📒 Техник журналлар',
+                  web_app: {
+                    url: `${WEB_APP_URL.replace(/\/$/, '')}/journals.html`
                   }
                 }
               ]
@@ -452,6 +465,192 @@ app.post('/api/send-to-manager', async (req, res) => {
       ok: false,
       error: error.message
     });
+  }
+});
+
+
+// =====================================================
+// ТЕХНИК ЖУРНАЛЛАР
+// =====================================================
+
+const JOURNAL_IDS = new Set([
+  '16d', '10', '15', 'chiller', 'drill', 'produvka', 'quritish', '21', '3b'
+]);
+
+const WRITER_ROLES = new Set(['machinist', 'engineer']);
+
+function journalUser(req, res) {
+  const user = getUserFromRequest(req);
+
+  if (!user) {
+    res.status(401).json({ ok: false, error: 'Telegram маълумотлари тасдиқланмади.' });
+    return null;
+  }
+
+  if (user.role === 'unknown') {
+    res.status(403).json({
+      ok: false,
+      error: 'Сиз AGNKS NAZORAT тизимига рўйхатдан ўтмагансиз.',
+      telegramId: user.id
+    });
+    return null;
+  }
+
+  return user;
+}
+
+// Мижоздан келган ёзувни текшириш: фақат маълум журнал,
+// қисқа матнлар ва продувка соатлари рўйхати.
+function cleanEntry(body) {
+  const j = String(body?.j || '');
+  if (!JOURNAL_IDS.has(j)) return null;
+
+  const d = String(body?.d || '');
+  if (d && !/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+
+  const raw = body?.v;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+
+  const v = {};
+  const keys = Object.keys(raw);
+  if (keys.length > 40) return null;
+
+  for (const k of keys) {
+    if (!/^[a-zA-Z0-9]{1,20}$/.test(k)) return null;
+    const val = raw[k];
+
+    if (Array.isArray(val)) {
+      const hours = val.map(Number).filter(h => Number.isInteger(h) && h >= 1 && h <= 24);
+      v[k] = [...new Set(hours)].slice(0, 24);
+    } else if (typeof val === 'string' || typeof val === 'number') {
+      const text = String(val).trim().slice(0, 2000);
+      if (text) v[k] = text;
+    }
+  }
+
+  return { j, d, v };
+}
+
+app.post('/api/journals/entries', async (req, res) => {
+  const user = journalUser(req, res);
+  if (!user) return;
+
+  try {
+    return res.json({
+      ok: true,
+      me: user,
+      canWrite: WRITER_ROLES.has(user.role),
+      staff: MACHINISTS.map(x => x.name),
+      entries: await journals.list()
+    });
+  } catch (error) {
+    console.error('Journal list error:', error.message);
+    return res.status(500).json({ ok: false, error: 'Журнал ёзувлари ўқилмади.' });
+  }
+});
+
+app.post('/api/journals/save', async (req, res) => {
+  const user = journalUser(req, res);
+  if (!user) return;
+
+  if (!WRITER_ROLES.has(user.role)) {
+    return res.status(403).json({ ok: false, error: 'Сизда журналга ёзиш ҳуқуқи йўқ.' });
+  }
+
+  const entry = cleanEntry(req.body?.entry);
+  if (!entry) {
+    return res.status(400).json({ ok: false, error: 'Ёзув нотўғри тўлдирилган.' });
+  }
+
+  try {
+    const id = String(req.body?.entry?.id || '');
+    let saved;
+
+    if (id) {
+      const old = await journals.get(id);
+      if (!old) return res.status(404).json({ ok: false, error: 'Ёзув топилмади.' });
+      if (old.j !== entry.j) return res.status(400).json({ ok: false, error: 'Ёзув бошқа журналга тегишли.' });
+      saved = await journals.put({ ...entry, id, editedBy: user.id, editedByName: user.name });
+    } else {
+      saved = await journals.put({ ...entry, by: user.id, byName: user.name });
+    }
+
+    return res.json({ ok: true, entry: saved });
+  } catch (error) {
+    console.error('Journal save error:', error.message);
+    return res.status(500).json({ ok: false, error: 'Ёзув сақланмади.' });
+  }
+});
+
+app.post('/api/journals/delete', async (req, res) => {
+  const user = journalUser(req, res);
+  if (!user) return;
+
+  try {
+    const id = String(req.body?.id || '');
+    const old = await journals.get(id);
+    if (!old) return res.status(404).json({ ok: false, error: 'Ёзув топилмади.' });
+
+    // Ёзувни муҳандис ёки уни киритган машинист ўчира олади
+    if (user.role !== 'engineer' && old.by !== user.id) {
+      return res.status(403).json({ ok: false, error: 'Бу ёзувни фақат муҳандис ёки уни киритган ходим ўчира олади.' });
+    }
+
+    await journals.remove(id);
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('Journal delete error:', error.message);
+    return res.status(500).json({ ok: false, error: 'Ёзув ўчирилмади.' });
+  }
+});
+
+// Telegram ичида файл юклаб олиш ишламайди, шунинг учун тайёр PDF/Excel
+// фойдаланувчининг ўзига бот орқали юборилади.
+const FILE_TYPES = {
+  pdf: 'application/pdf',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+};
+
+app.post('/api/journals/send-file', express.json({ limit: '8mb' }), async (req, res) => {
+  const user = journalUser(req, res);
+  if (!user) return;
+
+  try {
+    const filename = String(req.body?.filename || '')
+      .replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_')
+      .slice(0, 120);
+    const ext = filename.split('.').pop().toLowerCase();
+
+    if (!FILE_TYPES[ext]) {
+      return res.status(400).json({ ok: false, error: 'Фақат PDF ёки Excel файл юбориш мумкин.' });
+    }
+
+    const bytes = Buffer.from(String(req.body?.data || ''), 'base64');
+    if (!bytes.length || bytes.length > 6 * 1024 * 1024) {
+      return res.status(400).json({ ok: false, error: 'Файл бўш ёки жуда катта.' });
+    }
+
+    const form = new FormData();
+    form.append('chat_id', user.id);
+    form.append('document', new Blob([bytes], { type: FILE_TYPES[ext] }), filename);
+
+    const caption = String(req.body?.caption || '').slice(0, 900);
+    if (caption) form.append('caption', caption);
+
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`,
+      { method: 'POST', body: form }
+    );
+    const data = await response.json();
+
+    if (!response.ok || !data.ok) {
+      throw new Error(data.description || 'Telegram API хатоси.');
+    }
+
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('Journal send-file error:', error.message);
+    return res.status(500).json({ ok: false, error: 'Файл Telegram га юборилмади.' });
   }
 });
 

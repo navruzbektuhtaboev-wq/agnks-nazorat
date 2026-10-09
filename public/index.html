@@ -298,6 +298,22 @@ textarea{
   border-radius:14px;
   margin-top:12px;
 }
+
+.journals-link{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  text-decoration:none;
+  color:#17324a;
+  font-size:18px;
+  font-weight:800;
+}
+
+.journals-sub{
+  font-size:14px;
+  font-weight:600;
+  color:#506b7c;
+}
 </style>
 </head>
 
@@ -793,6 +809,8 @@ function renderMachinist(me){
 
   </div>
 
+  ${journalsLink()}
+
   <div class="card">
 
     <div class="title">
@@ -1108,6 +1126,22 @@ async function sendReport(){
 
 
 // ======================================================
+// ТЕХНИК ЖУРНАЛЛАР ҲАВОЛАСИ
+// ======================================================
+
+function journalsLink(){
+
+  return `
+  <a class="card journals-link" href="/journals.html">
+    <span>📒 Техник журналлар</span>
+    <span class="journals-sub">Кўрик, текширув ва продувка журналларини юритиш ▸</span>
+  </a>
+  `;
+
+}
+
+
+// ======================================================
 // МУҲАНДИС ИНТЕРФЕЙСИ
 // ======================================================
 
@@ -1137,6 +1171,8 @@ async function renderEngineer(me){
     </div>
 
   </div>
+
+  ${journalsLink()}
 
   <div class="card">
 
