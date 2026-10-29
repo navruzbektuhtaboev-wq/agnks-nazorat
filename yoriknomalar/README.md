@@ -6,7 +6,9 @@
 - agnks-cabinet.html — кабинет (битта файл, версия 9). claude.ai Artifact сифатида нашр қилинган, `db`, `user`, `downloads` имкониятлари билан.
 - matnlar/*.json — 11 та йўриқнома матни (ЛОЙИҲА ҳолатида).
 - pdf_skript/mkpdf2.py — йўриқномалардан PDF ясайди (reportlab, Liberation Serif). gen.py/src.py — матнларни ҳосил қилади.
-- agnks-yoriknomalar-loyiha-v2.pdf — охирги PDF.
+- agnks-yoriknomalar-loyiha-v3.pdf — охирги PDF («ПОЙТУГ 888» МЧЖ АГНКС-1). v2 — олдинги нусха.
+
+Станция: «ПОЙТУГ 888» МЧЖ АГНКС-1.
 
 ## Маълумотлар (db)
 staff, docs, briefings, acks. Ҳужжат версияси ошса, «танишдим» бекор бўлади.

@@ -15,7 +15,9 @@ pdfmetrics.registerFont(TTFont("S-I",FD+"LiberationSerif-Italic.ttf"))
 pdfmetrics.registerFont(TTFont("S-BI",FD+"LiberationSerif-BoldItalic.ttf"))
 pdfmetrics.registerFontFamily("S",normal="S",bold="S-B",italic="S-I",boldItalic="S-BI")
 
-D="/tmp/claude-0/-home-claude/ba7274e0-4321-5b5a-a19c-366785861b5f/scratchpad/docs/"
+import os
+HERE=os.path.dirname(os.path.abspath(__file__))
+D=os.path.join(HERE,"..","matnlar","")
 order=["d-fire","d-emerg","d-leak","d-ppe","d-aid","d-oper","d-fill","d-vessel","d-elec","d-hot","d-guard"]
 
 base=ParagraphStyle("b",fontName="S",fontSize=11,leading=14.2,alignment=TA_JUSTIFY,spaceAfter=3)
@@ -30,7 +32,8 @@ cell=ParagraphStyle("c",parent=base,fontSize=10.5,leading=13,alignment=TA_LEFT,s
 cellh=ParagraphStyle("ch",parent=cell,fontName="S-B",alignment=TA_CENTER)
 
 
-ORG="ПОЙТУГ 888 МЧЖ"
+ORG="«ПОЙТУГ 888» МЧЖ"
+STATION="АГНКС-1"
 from reportlab.graphics.shapes import *
 RED=colors.HexColor("#D32F2F"); YEL=colors.HexColor("#FFC107"); GRN=colors.HexColor("#2E7D32")
 def flame(c,x,y,sz,col):
@@ -73,7 +76,7 @@ class Banner(Flowable):
     def draw(s):
         c=s.canv; logo(c,0,2*mm,15*mm)
         c.setFillColor(colors.HexColor("#0B4F8A")); c.setFont("S-B",14); c.drawString(18*mm,10*mm,ORG)
-        c.setFillColor(colors.HexColor("#444444")); c.setFont("S",9.5); c.drawString(18*mm,5*mm,"Автомобилларга газ қуйиш компрессор станцияси (АГНКС)")
+        c.setFillColor(colors.HexColor("#444444")); c.setFont("S",9.5); c.drawString(18*mm,5*mm,"Автомобилларга газ қуйиш компрессор станцияси "+STATION)
         x=s.w-5*13*mm
         for k in ["nosmoke","noflame","gas","ext","exit"]:
             sign(c,k,x,2*mm,12*mm); x+=13*mm
@@ -159,5 +162,5 @@ def build(path,keys):
         story+=[Spacer(1,4*mm),KeepTogether([sigblock()]),PageBreak(),Banner("")]+ack_sheet(d)
     doc.build(story)
 
-build("/home/claude/out/agnks-yoriknomalar-loyiha-v2.pdf",order)
+build(os.path.join(HERE,"..","agnks-yoriknomalar-loyiha-v3.pdf"),order)
 print("ok")
