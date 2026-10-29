@@ -1,0 +1,608 @@
+<title>АГНКС Хавфсизлик кабинети</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky signage-style bar; worker = one phone column, nazorat = wide journal matrix with tabs. */
+:root{
+  --bg:#EDF1F5; --surface:#FFFFFF; --surface2:#F4F7FA; --ink:#13202B; --muted:#56677A; --line:#D3DBE4;
+  --accent:#0A5C91; --accent-ink:#FFFFFF; --accent-soft:#DCEBF6;
+  --ok:#1B7A4B; --ok-soft:#DDF1E6; --warn:#8F5600; --warn-soft:#FBEBCF; --bad:#B3261E; --bad-soft:#FADCD9;
+  --f-head:'IBM Plex Sans Condensed','Arial Narrow',Arial,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E151B; --surface:#16202A; --surface2:#1B2732; --ink:#E5ECF2; --muted:#93A4B3; --line:#2B3946;
+    --accent:#4CA6DE; --accent-ink:#06151F; --accent-soft:#1A3446;
+    --ok:#52C58B; --ok-soft:#173A2B; --warn:#E6A94A; --warn-soft:#3C2E12; --bad:#F27A72; --bad-soft:#40201E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E151B; --surface:#16202A; --surface2:#1B2732; --ink:#E5ECF2; --muted:#93A4B3; --line:#2B3946;
+  --accent:#4CA6DE; --accent-ink:#06151F; --accent-soft:#1A3446;
+  --ok:#52C58B; --ok-soft:#173A2B; --warn:#E6A94A; --warn-soft:#3C2E12; --bad:#F27A72; --bad-soft:#40201E;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-head);margin:0;text-wrap:balance;font-weight:600;letter-spacing:.01em}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line);margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-mark{font-family:var(--f-mono);font-weight:500;font-size:12px;letter-spacing:.08em;background:var(--accent);color:var(--accent-ink);padding:4px 7px;border-radius:3px}
+.brand h1{font-size:19px;line-height:1.1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:transparent;padding:8px 14px;cursor:pointer;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.wrap{max-width:560px;margin:0 auto;padding-top:18px;display:flex;flex-direction:column;gap:16px}
+.wrap.wide{max-width:1240px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:8px 16px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.big{min-height:54px;font-size:17px;width:100%}
+.btn.sm{min-height:34px;padding:4px 12px;font-size:13px}
+.btn.danger{border-color:var(--bad);color:var(--bad);background:transparent}
+.btn.danger.armed{background:var(--bad);color:#fff}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--surface2);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.chip.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.chip.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.chip.sample{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+.small{font-size:13px}
+
+.state{padding:14px 16px;border-radius:6px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:6px}
+.state.ok{background:var(--ok-soft);border-color:transparent}
+.state.warn{background:var(--warn-soft);border-color:transparent}
+.state h2{font-size:21px}
+.who{display:flex;flex-direction:column;gap:2px}
+.who h2{font-size:24px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{border:0;background:transparent;padding:10px 14px;cursor:pointer;font-weight:500;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.item h3{font-size:18px;line-height:1.25}
+.item-top{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.doc-body{white-space:pre-wrap;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:12px;font-size:15px;max-height:60vh;overflow:auto;max-width:65ch}
+.done-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.done-row:last-child{border-bottom:0}
+.done-row div{min-width:0}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-size:20px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted);min-width:0}
+label.f input,label.f select,label.f textarea{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 10px;font-weight:400;color:var(--ink);min-width:0;width:100%}
+label.f textarea{min-height:110px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.row.sp{justify-content:space-between}
+.checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px}
+.checks label{display:flex;gap:8px;align-items:center;font-size:14px;padding:4px 0}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;background:var(--surface2);vertical-align:bottom}
+tr:last-child td{border-bottom:0}
+.mx th.doc{min-width:132px;max-width:170px;line-height:1.25}
+.mx th.doc .cat{display:block;font-family:var(--f-mono);font-weight:400;font-size:10px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.mx td.name,.mx th.name{position:sticky;left:0;background:var(--surface);z-index:1;min-width:170px;border-right:1px solid var(--line)}
+.mx th.name{background:var(--surface2)}
+.mx td.c{text-align:center;font-family:var(--f-mono);font-size:12px;white-space:nowrap}
+.mx td.ok{background:var(--ok-soft);color:var(--ok)}
+.mx td.pend{background:var(--warn-soft);color:var(--warn)}
+.mx td.na{color:var(--muted)}
+.mx tfoot td{font-family:var(--f-mono);font-size:12px;background:var(--surface2);font-weight:500}
+.sumline{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.sumline b{font-family:var(--f-mono);font-weight:500}
+.msg{white-space:pre-wrap;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:10px 12px;font-size:14px;max-width:70ch}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;font-weight:500;z-index:20;max-width:calc(100% - 32px);box-shadow:0 4px 18px rgba(0,0,0,.25)}
+.pick{display:flex;flex-direction:column;gap:8px}
+.pick button{display:flex;justify-content:space-between;gap:12px;align-items:center;text-align:left;min-height:52px;padding:10px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.pick button:hover{border-color:var(--accent)}
+.pick button:disabled{opacity:.45;cursor:not-allowed}
+.hint{font-size:13px;color:var(--muted);max-width:65ch}
+#d-modal{position:fixed;inset:0;background:rgba(5,12,18,.62);z-index:30;overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+#d-modal .modal-box{max-width:760px;margin:0 auto}
+@media (max-width:520px){.brand h1{font-size:17px}.who h2{font-size:22px}}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .18s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,8px)}}}
+
+#pr{position:fixed;inset:0;background:#e9ecef;z-index:40;overflow:auto;padding:12px}
+#pr .bar{max-width:210mm;margin:0 auto 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#pr .sheet{max-width:210mm;margin:0 auto;background:#fff;color:#111;padding:14mm 15mm 14mm 22mm;font:11.5pt/1.4 "Liberation Serif","Times New Roman",serif;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+#pr .ban{display:flex;align-items:center;gap:10px;border-bottom:2px solid #0B4F8A;padding-bottom:6px;margin-bottom:10px}
+#pr .ban b{color:#0B4F8A;font-size:15pt;display:block}#pr .ban small{font-size:9pt;color:#444}
+#pr .ban .sg{margin-left:auto;display:flex;gap:4px}#pr .sg svg{width:11mm;height:11mm}
+#pr h1{font-size:15pt;text-align:center;margin:6px 0}#pr .k{text-align:center;font-size:10.5pt}
+#pr .ap{margin-left:50%;font-size:10.5pt;margin-bottom:6px}
+#pr .h{font-weight:bold;margin:8px 0 3px}#pr .p{margin:2px 0;text-align:justify}#pr .b{margin:2px 0 2px 8mm}
+#pr .src{font-style:italic;font-size:10pt;margin-top:8px}#pr .sig{margin-top:12px;font-size:10.5pt}
+#pr .drf{color:#9a3b00;font-size:9pt;font-style:italic;margin-top:10px;border-top:1px solid #999;padding-top:3px}
+@media print{body>*:not(#pr){display:none!important}#pr{position:static;background:#fff;padding:0;overflow:visible}#pr .bar{display:none}#pr .sheet{box-shadow:none;max-width:none;padding:0 0 0 4mm}@page{size:A4;margin:14mm 12mm 14mm 20mm}}
+</style>
+
+<header class="bar">
+  <div class="brand"><span class="brand-mark">АГНКС</span><h1>Хавфсизлик кабинети</h1></div>
+  <div class="seg" id="viewseg" role="group" aria-label="Кўриниш" hidden>
+    <button type="button" id="vb-worker" aria-pressed="true">Ходим</button>
+    <button type="button" id="vb-admin" aria-pressed="false">Назорат</button>
+  </div>
+</header>
+
+<main>
+<section id="v-worker" class="wrap"></section>
+
+<section id="v-admin" class="wrap wide" hidden>
+  <div class="tabs" role="tablist" id="atabs">
+    <button role="tab" data-t="matrix" aria-selected="true">Танишув матрицаси</button>
+    <button role="tab" data-t="brief" aria-selected="false">Инструктаж журнали</button>
+    <button role="tab" data-t="docs" aria-selected="false">Йўриқномалар</button>
+    <button role="tab" data-t="staff" aria-selected="false">Ходимлар</button>
+    <button role="tab" data-t="tg" aria-selected="false">Telegram</button>
+  </div>
+
+  <div id="p-matrix" class="stack">
+    <div class="row sp">
+      <div class="sumline" id="m-sum"></div>
+      <div class="row">
+        <label class="f" style="flex-direction:row;align-items:center;gap:8px">АГНКС
+          <select id="f-station" style="width:auto"></select></label>
+        <button type="button" class="btn ghost sm" id="csv-btn">Журналдан CSV</button>
+      </div>
+    </div>
+    <div class="scroll"><table class="mx" id="m-table"></table></div>
+    <p class="hint">Ҳужжат янги версия билан чиқарилса, ҳамма ходим қайтадан танишади. Ҳар бир белги сана ва вақт билан ходимнинг ўз телефонидан сақланади.</p>
+  </div>
+
+  <div id="p-brief" class="stack" hidden>
+    <form class="panel" id="b-form" autocomplete="off">
+      <h2>Янги инструктаж ёзуви</h2>
+      <div class="grid2">
+        <label class="f">Сана<input type="date" id="b-date" required></label>
+        <label class="f">Тури<select id="b-type">
+          <option>Кириш инструктажи</option><option>Бирламчи (иш жойида)</option><option selected>Такрорий</option><option>Режадан ташқари</option><option>Мақсадли</option></select></label>
+        <label class="f">Ўтказган шахс<input type="text" id="b-cond" placeholder="Ф.И.Ш., лавозими" required></label>
+        <label class="f">АГНКС<select id="b-station"></select></label>
+      </div>
+      <label class="f">Мавзу<input type="text" id="b-topic" placeholder="Масалан: газ ҳиди сезилганда ҳаракатлар" required></label>
+      <div class="stack" style="gap:6px"><span class="small muted" style="font-weight:600">Қатнашчилар</span><div class="checks" id="b-partic"></div></div>
+      <div class="row"><button class="btn" type="submit">Журналга ёзиш</button><span class="hint">Ходимлар ўз телефонида «Инструктаж олдим» тугмасини босади.</span></div>
+    </form>
+    <div class="scroll"><table id="b-table"></table></div>
+  </div>
+
+  <div id="p-docs" class="stack" hidden>
+    <div id="d-home"><form class="panel" id="d-form" autocomplete="off">
+      <h2 id="d-h">Янги йўриқнома</h2>
+      <div class="grid2">
+        <label class="f">Номи<input type="text" id="d-title" required></label>
+        <label class="f">Йўналиш<select id="d-cat">
+          <option>Меҳнат муҳофазаси</option><option>Техника хавфсизлиги</option><option>Ёнғин хавфсизлиги</option><option>Электр хавфсизлиги</option><option>Авария ҳолати</option><option>Бошқа</option></select></label>
+        <label class="f">Версия рақами<input type="number" id="d-ver" min="1" value="1" required></label>
+        <label class="f">Сана<input type="date" id="d-date" required></label>
+        <label class="f">Ҳолати<select id="d-status"><option>Лойиҳа</option><option>Тасдиқланган</option></select></label>
+      </div>
+      <label class="f">Қайси лавозимлар учун (вергул билан; бўш қолса ҳамма учун)<input type="text" id="d-pos" list="dl-pos" placeholder="Масалан: Оператор, Машинист"></label>
+      <label class="f">Матн<textarea id="d-body" placeholder="Йўриқнома матнини шу ерга қўйинг. Word ёки PDF нусхани кейинги босқичда юклаймиз."></textarea></label>
+      <div class="row"><button class="btn" type="submit" id="d-save">Сақлаш</button><button class="btn ghost" type="button" id="d-cancel" hidden>Бекор қилиш</button><span class="hint" id="d-hint"></span></div>
+    </form></div>
+    <div class="stack" id="d-list"></div>
+  </div>
+
+  <div id="p-staff" class="stack" hidden>
+    <form class="panel" id="s-form" autocomplete="off">
+      <h2>Ходим қўшиш</h2>
+      <div class="grid2">
+        <label class="f">Ф.И.Ш.<input type="text" id="s-name" required></label>
+        <label class="f">Лавозим<input type="text" id="s-pos" list="dl-pos" required></label>
+        <label class="f">АГНКС<input type="text" id="s-station" list="dl-st" value="АГНКС-1" required></label>
+      </div>
+      <div class="row"><button class="btn" type="submit">Қўшиш</button></div>
+    </form>
+    <div class="scroll"><table id="s-table"></table></div>
+  </div>
+
+  <div id="p-tg" class="stack" hidden>
+    <div class="panel">
+      <h2>Telegram эслатмалар</h2>
+      <p class="hint" style="margin:0">Ҳозирча матнни нусхалаб, ходимга ўзингиз юборасиз. Бот уланганда шу матнлар автоматик кетади ва ходим «Танишдим» тугмасини Telegramнинг ўзида босади.</p>
+    </div>
+    <div class="stack" id="tg-list"></div>
+  </div>
+</main>
+<div id="pr" hidden></div>
+<div id="d-modal" hidden><div class="modal-box" id="d-modal-box"></div></div>
+<footer class="hint mono" style="text-align:center;margin-top:28px">Кабинет · версия 10 · 29.10.2026</footer>
+
+<datalist id="dl-pos"></datalist>
+<datalist id="dl-st"></datalist>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})};
+  var TZ='Asia/Tashkent';
+  var FALLBACK=[{"title": "Ёнғин хавфсизлиги бўйича умумий йўриқнома", "category": "Ёнғин хавфсизлиги", "positions": [], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ТАЛАБЛАР\n1.1. Йўриқнома АГНКС ҳудудидаги барча ходимлар учун мажбурий.\n1.2. АГНКС табиий газ (метан) билан ишлайдиган ёнғин ва портлаш хавфи юқори объект. Газ ҳавода маълум концентрацияда бир учқундан ҳам портлайди.\n1.3. Ёнғин хавфсизлиги учун масъул шахс: Умаров Дилшодбек (муҳандис), тел. +998 93 412-13-51.\n1.4. Ҳар бир ходим ўт ўчиргичлар жойини, эвакуация йўлларини ва газни аварияли узиш тугмасини билиши шарт.\n\n2. ТАҚИҚЛАНАДИ\n- хавфли зоналарда чекиш, очиқ олов ёқиш, ёнувчи модда билан ишлаш;\n- хавфли зонада учқун чиқарувчи асбоб ва нормал ижродаги (портлашдан ҳимояланмаган) электр жиҳозлардан фойдаланиш;\n- мобил телефондан объектнинг ички қоидаларида белгиланган ҳудудларда фойдаланиш;\n- эвакуация йўлларини, ўт ўчиргичлар ва ўт ўчириш щитини тўсиш;\n- ўт ўчириш воситаларини бошқа мақсадда ишлатиш;\n- ёнувчи ва мойли латталарни белгиланмаган жойда қолдириш.\n\n3. ҲАР КУНИ ТЕКШИРИЛАДИ\n3.1. Ўт ўчиргичлар жойида, муҳри ва босим кўрсаткичи меъёрда.\n3.2. Эвакуация йўллари ва чиқиш эшиклари эркин.\n3.3. Хавфли зона белгилари ва огоҳлантириш ёзувлари жойида.\n3.4. Ўт ўчиргичларни текшириш ва қайта зарядлаш муддатлари журналда белгиланади.\n\n4. ЁНҒИН БЎЛГАНДА\n4.1. Дарҳол 101 га қўнғироқ қилинг ва раҳбарга хабар беринг.\n4.2. Газ узатишни аварияли тугма билан тўхтатинг (агар хавфсиз бўлса).\n4.3. Одамларни ва транспортни хавфсиз масофага чиқаринг.\n4.4. Кичик ўчоқни бошланғич ўт ўчириш воситалари билан ўчиришга фақат ўз хавфсизлигингизга хавф бўлмаса уриниб кўринг.\n4.5. ЁНАЁТГАН ГАЗНИ газ манбаи узилмасдан ЎЧИРМАНГ: газ тўпланиб, қайта портлаши мумкин.\n4.6. Ўт ўчириш хизмати келгач, объект ҳақида маълумот беринг ва унинг кўрсатмаларига бўйсунинг.\n\n5. ЖАВОБГАРЛИК\nЙўриқнома талабларини бузган ходим амалдаги қонунчиликка мувофиқ жавоб беради.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-fire", "fallback": true}, {"title": "Авария ҳолатида ҳаракатлар ва эвакуация", "category": "Авария ҳолати", "positions": [], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. МАҚСАД\nАвария, ёнғин, портлаш хавфи ёки газ тарқалишида ходимлар ҳаракатини тартибга солиш.\n\n2. ТЕЛЕФОНЛАР (ёзиб қўйинг ва ҳар бир иш жойига осиб қўйинг)\n- Ёнғин хизмати: 101\n- Тез ёрдам: 103\n- Газ авария хизмати: 104\n- АГНКС раҳбари: Абдупаттоев Абдурашид, тел. +998 91 173-00-23\n- Масъул шахс: Умаров Дилшодбек (муҳандис), тел. +998 93 412-13-51\n\n3. АВАРИЯ ҲОЛАТЛАРИ\n- ёнғин ёки тутун;\n- газ тарқалиши, кучли газ ҳиди;\n- идиш, қувур ёки шланг шикастланиши;\n- электр жиҳозда учқун, ёниш;\n- ходимнинг шикастланиши ёки ёмонлашуви.\n\n4. БИРИНЧИ ҚАДАМЛАР\n4.1. Хавфни кўрган ходим овоз чиқариб огоҳлантиради ва раҳбарга хабар беради.\n4.2. Газ тўлдиришни тўхтатади, транспорт ва мижозларни хавфли зонадан чиқаради.\n4.3. Аварияли тўхтатиш тугмасини босади (жойи: машинистлар хонаси).\n4.4. Тегишли хизматга қўнғироқ қилади: ёнғин бўлса 101, газ ҳиди бўлса 104, жабрланувчи бўлса 103.\n4.5. Хавфсиз бўлса, электр таъминотини белгиланган тартибда узади. Узиш пайтида учқун чиқмаслиги учун эҳтиёт бўлинг.\n\n5. ЭВАКУАЦИЯ\n5.1. Одамлар белгиланган йўллар орқали чиқади, тартибли, югурмасдан.\n5.2. Йиғилиш жойи: АГНКС чиқиш жойи. Шу ерда ходимлар рўйхат бўйича санаб чиқилади.\n5.3. Раҳбар қолган одам йўқлигини текшириб, ёнғин хизматига маълум қилади.\n5.4. Хавф тугаганини ёнғин хизмати ёки раҳбар эълон қилмагунча объектга қайтилмайди.\n\n6. МАШҚЛАР\nЭвакуация машқлари 3 ойда бир марта ўтказилади ва машқлар журналига ёзилади.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-emerg", "fallback": true}, {"title": "Газ тарқалиши (газ ҳиди) аниқланганда ҳаракатлар", "category": "Авария ҳолати", "positions": [], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. АЛОМАТЛАР\n- хос газ ҳиди (одорант ҳиди);\n- сиқиқ ҳаво шиғиллаши;\n- газ анализатор сигнали;\n- манометр босимининг тушиши.\n\n2. БИРИНЧИ ДАҚИҚАЛАРДА\n2.1. Хавфни ким сезса, дарҳол раҳбарга ва ёнидагиларга хабар беради.\n2.2. Газ тўлдиришни тўхтатинг, транспорт двигателини ўчиришни сўранг.\n2.3. Ҳеч қандай электр калитини ёқманг ва ўчирманг, лифт ва электр асбобларни ишлатманг. Телефондан хавфли зонадан узоқда гаплашинг.\n2.4. Очиқ олов, чекиш, учқун чиқарувчи ҳар қандай ишни тўхтатинг.\n2.5. Метан ҳаводан енгил: ёпиқ хоналарда шифт остида тўпланади. Эшик ва дарчаларни очиб, хонани шамоллатинг.\n2.6. Одамларни шамол йўналишига нисбатан хавфли зонадан узоққа, шамолга қарши томонга олиб чиқинг.\n\n3. ХИЗМАТЛАРГА ХАБАР\n- Газ авария хизмати: 104\n- Тўғридан-тўғри хавф ёки ёнғин бўлса: 101\n- Жабрланувчи бўлса: 103\n\n4. ТАМИРЛАШ\n4.1. Газ тарқалишини бартараф этиш фақат ваколатли ходимлар томонидан ва ёзма рухсат (наряд-допуск) билан амалга оширилади.\n4.2. Иш давомида газ анализатор билан концентрация назорат қилинади.\n4.3. Ишдан кейин зичлик синовдан ўтказилади ва натижа журналга ёзилади.\n\n5. ҚАЙД ЭТИШ\nҲар бир ҳодиса «Ҳодиса ва огоҳлантиришлар» журналига ёзилади: сана, вақт, жой, сабаб, кўрилган чоралар.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-leak", "fallback": true}, {"title": "Шахсий ҳимоя воситалари", "category": "Меҳнат муҳофазаси", "positions": [], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. МАҚСАД\nХодимни ишлаш жойидаги хавфлардан ҳимоя қилувчи воситалардан тўғри фойдаланиш.\n\n2. АСОСИЙ ВОСИТАЛАР\n- Иш кийими: пахта толали, статик электр тўпламайдиган. Синтетик кийим хавфли зонада киймайди.\n- Оёқ кийими: учқун чиқармайдиган таглик, ҳимояли бурун.\n- Қўлқоп: иш тури бўйича (механик, диэлектрик, совуқдан ҳимоя).\n- Каска, кўз ойнаги, қулоқ тиқинлари: компрессор ва шовқинли жойда.\n- Индивидуал газ анализатор: хавфли жойларга кираётганда.\n- Нафас ҳимояси: рухсатнома талаб қилган ҳолларда.\n\n3. ТАЛАБЛАР\n3.1. Воситалар ходимга ишга киришиши билан берилади ва ҳисобга олинади.\n3.2. Ишдан олдин ҳолати текширилади: ёриқ, ўйилган, нам ёки эскирган бўлса алмаштирилади.\n3.3. Воситалар ўз вақтида тозаланади ва белгиланган жойда сақланади.\n3.4. Ҳимоясиз хавфли зонага кириш тақиқланади.\n\n4. ЖАВОБГАРЛИК\nХодим воситаларни талаб бўйича ишлатиши, носоз воситани раҳбарга ўз вақтида маълум қилиши керак.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-ppe", "fallback": true}, {"title": "Биринчи тиббий ёрдам", "category": "Меҳнат муҳофазаси", "positions": [], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ҚОИДА\n1.1. Жабрланувчи бўлса, аввал ўз хавфсизлигингизни таъминланг (газ, ток, ёнғин хавфини бартараф этинг).\n1.2. 103 га қўнғироқ қилинг ва раҳбарга хабар беринг.\n1.3. Тиббий ёрдам келгунча қуйидагиларни бажаринг.\n\n2. ДОРИ ҚУТИСИ\nДори қути иш жойида, кўриниб турадиган жойда бўлади: оператор хонаси. Таркиби ва яроқлилик муддати ойига бир марта текширилади, масъул: А. Абдупаттоев (АГНКС раҳбари).\n\n3. ВАЗИЯТЛАР\n3.1. Газдан заҳарланиш, ҳушдан кетиш: жабрланувчини тоза ҳавога олиб чиқинг, кийимни бўшатинг, нафас ва юрак уришини текширинг. Нафас йўқ бўлса, сунъий нафас ва кўкрак қафасини босиш ҳаракатларини бошланг.\n3.2. Электр токи урганда: аввал токни узинг, сўнг юқоридаги қадамларни бажаринг.\n3.3. Куйиш: куйган жойни тоза оқар сув билан совутинг, дори ёки ёғ суртманг, тоза мато билан ўранг.\n3.4. Қон кетиши: қон кетаётган жойни тоза мато билан босиб, босувчи боғич қўйинг. Оёқ-қўлни кўтаринг.\n3.5. Сиқилган газ оқимидан совуқ куйиш: жойни аста илитинг, ишқаламанг, тоза мато билан ўранг.\n3.6. Суяк синиши: ҳаракатсиз қилиб боғланг, жабрланувчини сурилишдан сақланг.\n\n4. ҚАЙД ЭТИШ\nҲар бир ҳодиса ва кўрсатилган ёрдам журналга ёзилади.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-aid", "fallback": true}, {"title": "Компрессор станцияси операторининг меҳнат муҳофазаси йўриқномаси", "category": "Меҳнат муҳофазаси", "positions": ["Оператор", "Машинист"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ТАЛАБЛАР\n1.1. Операторлик ишига тиббий кўрикдан ўтган, кириш ва иш жойидаги инструктаж олган, билим синовидан ўтган шахслар қўйилади.\n1.2. Оператор ишлаш жойидаги хавфли омиллар: босим остидаги газ, портлаш ва ёнғин хавфи, шовқин, ҳаракатланувчи механизмлар, электр токи, автомобил ҳаракати.\n1.3. Оператор ишни ______ ҳужжатларида кўрсатилган режим ва тартиб бўйича бажаради.\n\n2. ИШ БОШЛАШДАН ОЛДИН\n2.1. Иш кийими ва шахсий ҳимоя воситаларини кийинг (алоҳида «Шахсий ҳимоя воситалари» йўриқномасига қаранг).\n2.2. Олдинги сменадан топшириқ ва журнални ўқинг, камчиликлар ҳақида маълумот олинг.\n2.3. Қуйидагиларни кўздан кечиринг: компрессор, ресивер, шланглар, уланишлар, манометрлар, сақлагич клапанлар, аварияли тўхтатиш тугмаси, ўт ўчиргичлар.\n2.4. Газ анализатор ва сигнализация ишлашини текширинг.\n2.5. Камчилик топилса, ишни бошламасдан раҳбарга хабар беринг ва журналга ёзинг.\n\n3. ИШ ВАҚТИДА\n3.1. Манометрлар кўрсаткичини ва ҳароратни белгиланган вақтда назорат қилиб, журналга ёзинг.\n3.2. Рухсат этилган иш босимидан (қурилма паспортига қаранг: ____________) ошишга йўл қўйманг.\n3.3. Ишлаб турган қурилмани қаровсиз қолдирманг, иш жойида четдан одамларни йўлатманг.\n3.4. Ҳаракатланувчи қисмларни, босим остидаги уланишларни ушламанг, тузатманг, мойламанг.\n3.5. Газ ҳиди, шовқин ўзгариши, титраш, ҳарорат кўтарилишини сезсангиз, қурилмани тўхтатиб, раҳбарга хабар беринг.\n3.6. Автомобилларга газ тўлдириш алоҳида тартиб бўйича амалга оширилади.\n\n4. АВАРИЯ ҲОЛАТИДА\n«Авария ҳолатида ҳаракатлар ва эвакуация» ҳамда «Газ тарқалиши аниқланганда ҳаракатлар» йўриқномалари бўйича ҳаракат қилинг.\n\n5. СМЕНА ТУГАГАНДА\n5.1. Иш жойини, асбобларни ва журналларни тартибга келтиринг.\n5.2. Қабул қилувчи оператор билан қурилма ҳолатини биргаликда кўриб, смена топширилганини журналга ёзинг.\n5.3. Ёнувчи материалларни ва латталарни белгиланган жойга қўйинг.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-oper", "fallback": true}, {"title": "Автомобилларга газ тўлдириш тартиби", "category": "Техника хавфсизлиги", "positions": ["Оператор", "Газ тўлдирувчи"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. МАҚСАД\nМижоз автомобилини газ билан тўлдириш пайтида ёнғин, портлаш ва шикастланишларнинг олдини олиш.\n\n2. ТЎЛДИРИШДАН ОЛДИН\n2.1. Автомобил белгиланган жойда тўхтасин, двигатель ўчирилсин, қўл тормози тортилсин.\n2.2. Автомобилда чекиш, ёнувчи модда ва очиқ олов бўлмасин. Йўловчилар ва ҳайдовчи ички қоидаларда белгиланган тартибда (оператор хонаси олдидаги кутиш жойида) хавфсиз жойда туришади.\n2.3. Газ баллони бўйича ҳужжат ва белгини текширинг: синов (гидравлик текширув) муддати ўтмаган ва баллон ташқи шикастсиз бўлиши керак.\n2.4. Автомобил ёки баллондан газ ҳиди, шиғиллаш, коррозия, зарба излари бўлса, газ тўлдирмасдан раҳбарга хабар беринг.\n2.5. Тўлдириш шланги ва уловчи қисмини кўриб чиқинг, шикаст бўлса ишлатманг.\n\n3. ТЎЛДИРИШ ВАҚТИДА\n3.1. Шлангни фақат тўлиқ мустаҳкам уланганидан кейин ишга туширинг.\n3.2. Оператор аварияли тўхтатиш тугмасига етиб боришга тайёр туради ва жараённи кузатади.\n3.3. Босим автомобил баллонига рухсат этилган даражадан ошмаслиги керак (баллон белгисига қаранг).\n3.4. Автомобил двигатели ва электр жиҳозларини ёқишга йўл қўйманг.\n3.5. Тўлдириш пайтида ҳеч ким колонкадан узоқлашмайди ва телефондан фойдаланмайди.\n\n4. ТЎЛДИРИШДАН КЕЙИН\n4.1. Босим белгиланган тартибда пасайтирилгандан кейингина шлангни ажратинг.\n4.2. Шлангни жойига осинг, уловчи қисмга чанг ва ифлослик тушмасин.\n4.3. Ҳайдовчига автомобилни хавфсиз тезликда олиб чиқишни айтинг.\n\n5. ТЎЛДИРИЛМАЙДИ\n- баллон синов муддати ўтган, шикастли, ҳужжатсиз;\n- газ ҳиди ёки сизиш бор;\n- ҳайдовчи ёки йўловчи ичкиликдан кейин хавфли ҳаракат қилса ёки қоидаларга бўйсунмаса;\n- электр заряд тўплайдиган кийим ва ҳаракатлар (синтетикани силкитиш, статик) хавфли бўлса.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-fill", "fallback": true}, {"title": "Босим остида ишлайдиган идишлар хавфсизлиги", "category": "Техника хавфсизлиги", "positions": ["Оператор", "Машинист", "Муҳандис"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ТАЛАБЛАР\n1.1. Идишлар, ресиверлар, қувурлар ва газ арматураси фақат паспорт ва рухсатномага мувофиқ ишлатилади.\n1.2. Ҳар бир идиш учун паспорт, рўйхатга олиш рақами, рухсат этилган иш босими ва кейинги текширув санаси кўрсатилган бўлиши керак. Бу маълумотлар АГНКС компьютерида сақланади.\n1.3. Идиш ва арматурага масъул шахс: Умаров Дилшодбек (муҳандис), тел. +998 93 412-13-51.\n\n2. КУНДАЛИК ТЕКШИРИШ\n2.1. Идиш ва қувурнинг ташқи кўриниши: деформация, коррозия, сизиш, зарба излари.\n2.2. Манометр: муҳрланган, текширув муддати ўтмаган, кўрсаткичи ўқилади.\n2.3. Сақлагич клапан: жойида, муҳри бутун, ёпилган.\n2.4. Электр ерга уланиши (заземление) ва статик заряддан ҳимоя узилмаган.\n2.5. Ёнидаги ёнғин ўчирувчи ва белгилар жойида.\n\n3. ТАҚИҚЛАНАДИ\n- рухсат этилган иш босимидан ортиқ босим бериш;\n- босим остидаги идиш ва қувурда ямаш, шиббалаш, бураш, уриш;\n- сақлагич клапанларни, манометрларни носоз ёки муддати ўтган ҳолда ишлатиш;\n- сақлагич клапаннинг созлаш босимини ўзбошимча ўзгартириш ёки уни бекитиб қўйиш;\n- рухсатсиз ўзгартириш киритиш.\n\n4. ТАЪМИРЛАШ\n4.1. Идиш ва қувурни фақат босим олиб ташланиб, газдан бўшатилиб, узилган ва белгиланган тартибда рухсат (наряд-допуск) олингандан кейин таъмирлашга рухсат этилади.\n4.2. Узилган арматурага «Ёқма! Одамлар ишламоқда!» ёзуви осилади.\n4.3. Таъмирдан кейин зичлик синови ўтказилади, натижа журналга ёзилади.\n\n5. ДАВРИЙ ТЕКШИРУВЛАР\nТехник кўрик, гидравлик синов, ички текширув муддатлари журналда ва техника бўлими режасида юритилади. Муддати яқинлашганда кабинет огоҳлантиради.\n\n6. ХАВФ ТУҒИЛСА\nБосим кескин ошса ёки идиш шикастланса, қурилмани тўхтатинг, зонани бўшатинг, 104 ва раҳбарга хабар беринг.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-vessel", "fallback": true}, {"title": "Электр хавфсизлиги бўйича йўриқнома", "category": "Электр хавфсизлиги", "positions": ["Муҳандис", "Машинист", "Электрик"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ТАЛАБЛАР\n1.1. Электр қурилмаларда ишлаш учун тегишли электр хавфсизлиги гуруҳи ва тасдиқланган малака керак.\n1.2. АГНКС ҳудудининг хавфли зоналарида фақат портлашдан ҳимояланган электр жиҳозлар ишлатилади.\n1.3. Электр хавфсизлиги учун масъул шахс: Умаров Дилшодбек (муҳандис), тел. +998 93 412-13-51.\n\n2. ИШ БОШЛАШДАН ОЛДИН\n2.1. Ҳимоя воситаларини (диэлектрик қўлқоп, калиш, изоляцияланган асбоб) ва уларнинг текширув муддатини кўрикдан ўтказинг.\n2.2. Ишлаш жойини, шчит ва кабелларни кўздан кечиринг.\n2.3. Ишни ёзма топшириқ, наряд ёки буйруқ асосида бошланг.\n\n3. ЭЛЕКТР ТАЪМИНОТИНИ УЗИШ ТАРТИБИ\n3.1. Тармоқдан узинг ва узилганини аниқланг.\n3.2. Узгични қулфланг ёки ёзув осинг: «Ёқма! Одамлар ишламоқда!».\n3.3. Кучланиш йўқлигини асбоб билан текширинг.\n3.4. Зарурат бўлса, ерга улаш (заземление) ўрнатинг.\n3.5. Фақат шундан кейин ишга киришинг.\n\n4. ТАҚИҚЛАНАДИ\n- кучланиш остида ёки кучланиш йўқлиги текширилмаган қурилмада ишлаш;\n- зарарланган кабель, розетка ва асбоб билан ишлаш;\n- нам қўл билан, ҳўл ерда ва ҳимоясиз ишлаш;\n- шчит ва шкафларни очиқ қолдириш;\n- хавфли зонада учқунловчи қурилмани ёқиш.\n\n5. ЭЛЕКТР ТОКИ УРГАНДА\n5.1. Аввал токни узинг. Ток остидаги одамни қуруқ изоляция воситаси билан ажратинг.\n5.2. Жабрланувчи нафас олмаса, 103 га қўнғироқ қилинг ва қутқарув ҳаракатларини бошланг (қаранг: «Биринчи тиббий ёрдам»).\n5.3. Ҳодисани раҳбарга хабар беринг.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-elec", "fallback": true}, {"title": "Олов ва газ хавфли ишлар хавфсизлиги (наряд-допуск)", "category": "Меҳнат муҳофазаси", "positions": ["Муҳандис", "Машинист", "АГНКС раҳбари", "АГНКС бошлиғи"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. ҚАЙСИ ИШЛАР ХАВФЛИ\n- пайвандлаш, кесиш, кавшарлаш, шлифлаш, учқун чиқарувчи ҳар қандай иш;\n- газ қувурлари, идишлар ва арматурада иш;\n- ёпиқ ва қийин етишадиган жойларда (қудуқ, камера) иш;\n- газ-хавфли жойларда электр ишлари.\n\n2. РУХСАТНОМА (наряд-допуск)\n2.1. Бундай ишлар фақат ёзма рухсатнома асосида бажарилади: иш тури, жойи, вақти, масъуллар, хавфсизлик чоралари кўрсатилади.\n2.2. Рухсатнома берувчи: А. Абдупаттоев (АГНКС раҳбари). Иш раҳбари: А. Абдупаттоев. Бажарувчилар: рўйхат бўйича.\n2.3. Ҳамма иштирокчилар рухсатнома билан таништирилиши ва имзо қўйиши (ёки электрон тасдиқ) шарт.\n\n3. ТАЙЁРГАРЛИК\n3.1. Иш участкаси газдан бўшатилиб, узилади ва қўшни тармоқлардан ажратилади.\n3.2. Қувур ва идиш тозаланади (продувка) ва газ анализатор билан концентрация текширилади, натижа рухсатномага ёзилади.\n3.3. Атрофдаги ёнувчи материаллар олиб ташланади ёки ҳимояланади.\n3.4. Ўт ўчиргичлар тайёр туради.\n3.5. Кузатувчи (ишга аралашмайдиган) тайинланади.\n\n4. ИШ ПАЙТИДА\n4.1. Концентрация белгиланган оралиқда қайта текширилади, ошса иш тўхтатилади.\n4.2. Иш жойини ташлаб кетиш, кузатувчисиз ишлаш тақиқланади.\n4.3. Хавф сезилса, иш дарҳол тўхтатилади ва раҳбарга хабар берилади.\n\n5. ИШ ТУГАГАНДА\n5.1. Иш жойи тозаланади, ёнғин хавфи йўқлиги текширилади.\n5.2. Белгиланган муддат давомида иш жойи кузатилади.\n5.3. Рухсатнома ёпилади ва журналга ёзилади.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-hot", "fallback": true}, {"title": "Қоровул (қўриқчи) йўриқномаси", "category": "Ёнғин хавфсизлиги", "positions": ["Қоровул"], "body": "ЛОЙИҲА. Тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва ўз АГНКСингиз паспорти бўйича текширинг, «____» жойларни тўлдиринг.\n\n1. УМУМИЙ ТАЛАБЛАР\n1.1. Қоровул объектни қўриқлаш ва кириш-чиқиш тартибини назорат қилади.\n1.2. АГНКС ёнғин ва портлаш хавфи юқори объект эканини ва хавфли зоналарни билиши шарт.\n1.3. Қоровул ёнғин хавфсизлиги ва аварияда ҳаракатлар бўйича йўриқномалар билан таништирилган бўлиши керак.\n\n2. ИШ БОШЛАШДА\n2.1. Смена топширилганини қабул қилиб, журналга ёзиш.\n2.2. Ўт ўчиргичлар, аварияли чиқиш йўллари ва кириш дарвозаси ҳолатини кўздан кечириш.\n2.3. Телефон рақамлари жойида эканини текшириш: 101, 103, 104, раҳбар.\n\n3. ИШ ВАҚТИДА\n3.1. Ходим бўлмаган шахсларни хавфли зонага киритмаслик.\n3.2. Чекиш, очиқ олов ёқиш ва қоидабузарликларга йўл қўймаслик.\n3.3. Тартиб бузилса, раҳбарга хабар бериш.\n3.4. Шубҳали шахс, нарса ёки аломатни кўрса, ўзи ҳаракат қилмасдан, раҳбарга ва зарур бўлса 102 га хабар бериш.\n3.5. Транспорт навбатини ва йўл ҳаракатини тартибга солишда ёрдам бериш.\n\n4. АВАРИЯДА\n4.1. Ёнғин ёки газ ҳиди сезилса, дарҳол 101/104 га ва раҳбарга хабар бериш.\n4.2. Одамларни ва транспортни хавфсиз томонга йўналтириш, дарвозани очиш.\n4.3. Ёнғин хизматини кутиб олиб, йўл кўрсатиш.\n\nЭЛЕКТРОН ТАСДИҚ\nЙўриқнома билан танишганлик ходимнинг «Танишдим» тугмаси ва сана-вақт ёзуви орқали кабинетда қайд этилади.", "version": 1, "issued": "2026-10-29", "archived": false, "sample": false, "draft": true, "createdAt": "2026-10-29T09:30:00.000Z", "id": "d-guard", "fallback": true}];
+  var S={staff:[],docs:[],briefings:[],acks:[]};
+  var db=null,uid=null,isAdmin=false,downloads=null,ready=false,dbErr='';
+  var view='worker',wtab='todo',openDocs={},openBrief={},editingId=null,toastT=0;
+
+  function fmtDT(iso){try{return new Date(iso).toLocaleString('ru-RU',{timeZone:TZ,day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}catch(e){return ''}}
+  function fmtShort(iso){try{return new Date(iso).toLocaleDateString('ru-RU',{timeZone:TZ,day:'2-digit',month:'2-digit'})}catch(e){return ''}}
+  function fmtD(ymd){if(!ymd)return '';var p=String(ymd).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:ymd}
+  function today(){return new Date().toLocaleDateString('en-CA',{timeZone:TZ})}
+  function toast(t){var el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){el.hidden=true},2800)}
+  function uuid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+
+  /* ---------- derived data ---------- */
+  function usingFallback(){return !S.docs.length}
+  function liveDocs(){if(usingFallback())return FALLBACK;return S.docs.filter(function(d){return !d.archived}).sort(function(a,b){return String(a.category).localeCompare(String(b.category),'ru')||String(a.title).localeCompare(String(b.title),'ru')})}
+  function activeStaff(){return S.staff.slice().sort(function(a,b){return String(a.station).localeCompare(String(b.station),'ru')||String(a.name).localeCompare(String(b.name),'ru')})}
+  function stations(){var m={};S.staff.forEach(function(s){if(s.station)m[s.station]=1});return Object.keys(m).sort(function(a,b){return a.localeCompare(b,'ru')})}
+  function required(st,d){return !d.positions||!d.positions.length||d.positions.indexOf(st.position)>-1}
+  function ackKey(d){return d.id+'_v'+d.version}
+  function acksOf(st){return S.acks.filter(function(a){return a.staffId===st.id})}
+  function docAt(st,d){var k=ackKey(d),r=null;acksOf(st).forEach(function(a){if(a.docs&&a.docs[k])r=a.docs[k]});return r}
+  function briefAt(st,b){var r=null;acksOf(st).forEach(function(a){if(a.briefings&&a.briefings[b.id])r=a.briefings[b.id]});return r}
+  function pendingDocs(st){return liveDocs().filter(function(d){return required(st,d)&&!docAt(st,d)})}
+  function pendingBriefs(st){return S.briefings.filter(function(b){return (b.staffIds||[]).indexOf(st.id)>-1&&!briefAt(st,b)})}
+  function me(){var a=S.acks.find(function(x){return x.id===uid});return a?S.staff.find(function(s){return s.id===a.staffId}):null}
+
+  /* ---------- worker view ---------- */
+  function libItem(d,st){
+    var open=!!openDocs[d.id],t=st?docAt(st,d):null,req=!st||required(st,d);
+    var h='<article class="item"><div class="item-top"><span class="chip">'+esc(d.category)+'</span><span class="chip mono">в'+esc(d.version)+'</span>';
+    if(st)h+=!req?'<span class="chip">сизга тегишли эмас</span>':t?'<span class="chip ok">танишдингиз '+fmtShort(t)+'</span>':'<span class="chip warn">кутмоқда</span>';
+    if(d.draft)h+='<span class="chip warn sample">ЛОЙИҲА</span>';if(d.sample)h+='<span class="chip sample">НАМУНА</span>';
+    h+='</div><h3>'+esc(d.title)+'</h3><span class="muted small">Сана: '+fmtD(d.issued)+'</span>';
+    if(open){
+      h+='<div class="doc-body">'+esc(d.body||'Матн киритилмаган.')+'</div>';
+      if(st&&req&&!t)h+='<button type="button" class="btn big" data-sign="'+esc(d.id)+'">Танишдим</button>';
+      h+='<button type="button" class="btn ghost" data-print="'+esc(d.id)+'">PDF</button><button type="button" class="btn ghost" data-close="'+esc(d.id)+'">Ёпиш</button>';
+    }else h+='<button type="button" class="btn ghost" data-open="'+esc(d.id)+'">Ўқиш</button>';
+    return h+'</article>';
+  }
+  function libSection(){
+    var ld=liveDocs();
+    var h='<div class="who" style="margin-top:8px"><h2>Йўриқномалар</h2><span class="muted">Ҳамма йўриқномаларни ўқиш мумкин.</span></div>';
+    if(usingFallback())h+='<div class="state warn"><span>Маълумот базаси ҳозир уланмаган ёки бўш. Йўриқномалар ўқиш режимида кўрсатилмоқда, «Танишдим» белгиси сақланмайди.</span></div>';
+    return h+'<div class="stack">'+ld.map(function(d){return libItem(d,null)}).join('')+'</div>';
+  }
+
+  /* ---------- PDF / чоп этиш ---------- */
+  var SG={
+   nosmoke:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#fff" stroke="#D32F2F" stroke-width="3.5"/><rect x="9" y="18" width="17" height="4" fill="#111"/><rect x="26" y="18" width="4" height="4" fill="#E65100"/><path d="M29 16v-5" stroke="#111" stroke-width="1.2"/><path d="M9 31L31 9" stroke="#D32F2F" stroke-width="3.5"/></svg>',
+   noflame:'<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#fff" stroke="#D32F2F" stroke-width="3.5"/><path d="M20 30c-6-1-8-7-5-12 1 3 3 3 4 1 0-3 1-6 3-8 0 4 5 6 5 12 0 4-3 7-7 7z" fill="#111"/><path d="M9 31L31 9" stroke="#D32F2F" stroke-width="3.5"/></svg>',
+   gas:'<svg viewBox="0 0 40 40"><path d="M20 3L38 35H2z" fill="#FFC107" stroke="#111" stroke-width="2" stroke-linejoin="round"/><path d="M20 31c-5-1-6-6-4-10 1 2 2 2 3 1 0-2 1-5 2-6 0 3 4 5 4 9 0 3-2 6-5 6z" fill="#111"/></svg>',
+   ext:'<svg viewBox="0 0 40 40"><rect x="1.5" y="1.5" width="37" height="37" rx="3" fill="#D32F2F"/><rect x="14" y="14" width="12" height="20" rx="3" fill="#fff"/><rect x="18" y="8" width="5" height="7" fill="#fff"/><rect x="14" y="8" width="12" height="3" fill="#fff"/><path d="M27 9l5 6" stroke="#fff" stroke-width="2"/></svg>',
+   exit:'<svg viewBox="0 0 40 40"><rect x="1.5" y="1.5" width="37" height="37" rx="3" fill="#2E7D32"/><rect x="8" y="8" width="9" height="24" fill="#fff"/><path d="M20 20h12" stroke="#fff" stroke-width="3"/><path d="M34 20l-6-6v12z" fill="#fff"/></svg>',
+   logo:'<svg viewBox="0 0 40 40" style="width:15mm;height:15mm"><rect width="40" height="40" rx="7" fill="#0B4F8A"/><path d="M20 24c-6-1-8-7-5-12 1 3 3 3 4 1 0-3 1-6 3-9 0 5 5 7 5 13 0 4-3 7-7 7z" fill="#FFB300"/><text x="20" y="37" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff" font-family="Arial">888</text></svg>'};
+  function printHtml(d){
+    var ln=String(d.body||'').replace(/^ЛОЙИҲА[^\n]*\n\n/,'').split('\n\nЭЛЕКТРОН ТАСДИҚ')[0].split('\n'),h='';
+    ln.forEach(function(x){x=x.replace(/\s+$/,'');if(!x)return;
+      if(/^\d+\.\s+[А-ЯЁЎҚҒҲ]{3,}/.test(x))h+='<div class="h">'+esc(x)+'</div>';
+      else if(/^\d+\.\d+\./.test(x)){var i=x.indexOf(' ');h+='<div class="p"><b>'+esc(x.slice(0,i))+'</b> '+esc(x.slice(i+1))+'</div>'}
+      else if(x.indexOf('Асос:')===0)h+='<div class="src">'+esc(x)+'</div>';
+      else if(x.indexOf('- ')===0)h+='<div class="b">— '+esc(x.slice(2))+'</div>';
+      else h+='<div class="p">'+esc(x)+'</div>'});
+    return '<div class="bar"><button type="button" class="btn big" id="pr-go">PDF / Чоп этиш</button><button type="button" class="btn ghost" id="pr-x">Ёпиш</button><span class="hint">«PDF / Чоп этиш» ни босинг → принтер ўрнига «PDF сифатида сақлаш»ни танланг. Компьютерда Ctrl+P ҳам ишлайди.</span></div>'
+    +'<div class="sheet"><div class="ban">'+SG.logo+'<div><b>«ПОЙТУГ 888» МЧЖ</b><small>Автомобилларга газ қуйиш компрессор станцияси АГНКС-1</small></div></div>'
+    +'<div class="ap"><b>ТАСДИҚЛАЙМАН</b><br>АГНКС бошлиғи<br>______________ ______________<br>«____» __________ 20___ й.</div>'
+    +'<div class="k">ЙЎРИҚНОМА № ____</div><h1>'+esc(String(d.title).toUpperCase())+'</h1><div class="k">'+esc(d.category)+' · Версия '+esc(d.version)+' · Сана: '+fmtD(d.issued)+'</div>'
+    +h+'<div class="sig">Ишлаб чиқди: ______________ / ______________<br>Меҳнат муҳофазаси бўйича масъул: ______________ / ______________</div>'
+    +(d.draft?'<div class="drf">ЛОЙИҲА: тасдиқлашдан олдин амалдаги меъёрий ҳужжатлар ва АГНКС паспорти билан текширилсин</div>':'')+'</div>';
+  }
+  function openPrint(id){
+    var d=liveDocs().concat(S.docs||[]).find(function(x){return x.id===id});
+    if(!d){toast('Ҳужжат топилмади');return}
+    var pr=$('#pr');pr.innerHTML=printHtml(d);pr.hidden=false;pr.scrollTop=0;
+    $('#pr-x').onclick=function(){pr.hidden=true;pr.innerHTML=''};
+    $('#pr-go').onclick=function(){try{window.print()}catch(e){toast('Ctrl+P босинг')}};
+  }
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('button[data-print]');if(b)openPrint(b.dataset.print)});
+  function renderWorker(){
+    var el=$('#v-worker');
+    if(!db){el.innerHTML='<div class="state"><h2>Кириш керак</h2><p style="margin:0">Кабинетни очиш учун claude.ai ҳисобингиз билан кириб, ҳаволани қайта очинг.'+(dbErr?'<br><span class="muted small">'+esc(dbErr)+'</span>':'')+'</p></div>'+libSection();return}
+    if(!uid){el.innerHTML='<div class="state"><h2>Ҳисоб аниқланмади</h2><p style="margin:0">Тизимга кирганингизни текширинг ва саҳифани қайта очинг.</p></div>'+libSection();return}
+    var st=me();
+    if(!st){
+      var taken={};S.acks.forEach(function(a){if(a.staffId&&a.id!==uid)taken[a.staffId]=1});
+      var h='<div class="who"><h2>Ўзингизни танланг</h2><span class="muted">Бир марта танлайсиз, кейин телефонингиз сизни танийди.</span></div>';
+      if(!S.staff.length)h+='<div class="state"><span>Ходимлар рўйхати ҳали бўш. Назоратчи рўйхатни киритгандан кейин қайта очинг.</span></div>';
+      h+='<div class="pick">'+activeStaff().map(function(s){return '<button type="button" data-pick="'+esc(s.id)+'"'+(taken[s.id]?' disabled':'')+'><span><b>'+esc(s.name)+'</b><br><span class="muted small">'+esc(s.position)+' · '+esc(s.station)+'</span></span>'+(taken[s.id]?'<span class="chip">банд</span>':'<span class="chip">Мен</span>')+'</button>'}).join('')+'</div>';
+      if(isAdmin)h+='<p class="hint">Назоратчи сифатида юқоридаги «Назорат» тугмаси орқали бошқарув бўлимига ўтишингиз мумкин.</p>';
+      var ld=liveDocs();
+      h+='<div class="who" style="margin-top:8px"><h2>Йўриқномалар</h2><span class="muted">Ҳамма йўриқномаларни ўқиш мумкин. «Танишдим» тугмаси ўзингизни танлагандан кейин чиқади.</span></div><div class="stack">'+(ld.length?ld.map(function(d){return libItem(d,null)}).join(''):'<div class="state">Йўриқнома ҳали киритилмаган.</div>')+'</div>';
+      el.innerHTML=h;return;
+    }
+    var pd=pendingDocs(st),pb=pendingBriefs(st),n=pd.length+pb.length;
+    var h='<div class="who"><h2>'+esc(st.name)+'</h2><span class="muted">'+esc(st.position)+' · '+esc(st.station)+'</span></div>';
+    h+=n===0?'<div class="state ok"><h2>Ҳаммаси бажарилган</h2><span>Танишиш кутаётган ҳужжат ва инструктаж йўқ.</span></div>'
+      :'<div class="state warn"><h2>'+n+' та белги кутмоқда</h2><span>'+(pd.length?pd.length+' та ҳужжат':'')+(pd.length&&pb.length?', ':'')+(pb.length?pb.length+' та инструктаж':'')+'</span></div>';
+    h+='<div class="tabs" role="tablist"><button role="tab" data-w="todo" aria-selected="'+(wtab==='todo')+'">Кутаётган ('+n+')</button><button role="tab" data-w="docs" aria-selected="'+(wtab==='docs')+'">Йўриқномалар</button><button role="tab" data-w="hist" aria-selected="'+(wtab==='hist')+'">Тарих</button></div>';
+    if(wtab==='todo'){
+      h+='<div class="stack">';
+      pd.forEach(function(d){
+        var open=!!openDocs[d.id];
+        h+='<article class="item"><div class="item-top"><span class="chip">'+esc(d.category)+'</span><span class="chip mono">в'+esc(d.version)+'</span>'+(d.draft?'<span class="chip warn sample">ЛОЙИҲА</span>':'')+(d.sample?'<span class="chip sample">НАМУНА</span>':'')+'</div><h3>'+esc(d.title)+'</h3><span class="muted small">Сана: '+fmtD(d.issued)+'</span>';
+        if(open){h+='<div class="doc-body">'+esc(d.body||'Матн киритилмаган.')+'</div><button type="button" class="btn big" data-sign="'+esc(d.id)+'">Танишдим</button><span class="hint">Босганингизда сана ва вақт сизнинг номингизга ёзилади.</span>'}
+        else h+='<button type="button" class="btn big" data-open="'+esc(d.id)+'">Ўқиш ва танишиш</button>';
+        h+='</article>';
+      });
+      pb.forEach(function(b){
+        h+='<article class="item"><div class="item-top"><span class="chip warn">Инструктаж</span><span class="chip">'+esc(b.type)+'</span></div><h3>'+esc(b.topic)+'</h3><span class="muted small">'+fmtD(b.date)+' · Ўтказди: '+esc(b.conductor)+'</span><button type="button" class="btn big" data-bsign="'+esc(b.id)+'">Инструктаж олдим</button></article>';
+      });
+      if(!n)h+='<p class="hint">Янги ҳужжат ёки инструктаж чиқса, шу ерда кўринади.</p>';
+      h+='</div>';
+    }else if(wtab==='docs'){
+      var ld2=liveDocs();
+      h+='<div class="stack">'+(ld2.length?ld2.map(function(d){return libItem(d,st)}).join(''):'<div class="state">Йўриқнома ҳали киритилмаган.</div>')+'</div>';
+    }else{
+      var rows=[];
+      liveDocs().forEach(function(d){var t=docAt(st,d);if(t)rows.push({t:t,a:d.title,b:'Ҳужжат · в'+d.version})});
+      S.briefings.forEach(function(b){var t=briefAt(st,b);if(t)rows.push({t:t,a:b.topic,b:'Инструктаж · '+b.type})});
+      rows.sort(function(x,y){return x.t<y.t?1:-1});
+      h+=rows.length?'<div class="item" style="gap:0">'+rows.map(function(r){return '<div class="done-row"><div><b>'+esc(r.a)+'</b><br><span class="muted small">'+esc(r.b)+'</span></div><span class="mono small muted" style="white-space:nowrap">'+fmtDT(r.t)+'</span></div>'}).join('')+'</div>':'<p class="hint">Ҳали белги йўқ.</p>';
+    }
+    el.innerHTML=h;
+  }
+
+  async function ackWrite(patch,okmsg){
+    try{await db.doc('acks/'+uid).update(patch);toast(okmsg)}catch(e){toast('Сақланмади. Интернетни текширинг ва қайта уриниб кўринг.')}
+  }
+  $('#v-worker').addEventListener('click',async function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.w){wtab=b.dataset.w;renderWorker();return}
+    if(b.dataset.open){openDocs[b.dataset.open]=1;renderWorker();return}
+    if(b.dataset.close){delete openDocs[b.dataset.close];renderWorker();return}
+    if(b.dataset.pick){
+      b.disabled=true;
+      try{await db.doc('acks/'+uid).set({staffId:b.dataset.pick,linkedAt:new Date().toISOString(),docs:{},briefings:{}});toast('Уланди')}catch(err){toast('Уланмади. Қайта уриниб кўринг.');b.disabled=false}
+      return;
+    }
+    if(b.dataset.sign){
+      var d=S.docs.find(function(x){return x.id===b.dataset.sign});if(!d)return;
+      b.disabled=true;var p={docs:{}};p.docs[ackKey(d)]=new Date().toISOString();
+      await ackWrite(p,'Сақланди: танишдингиз');delete openDocs[d.id];return;
+    }
+    if(b.dataset.bsign){
+      b.disabled=true;var q={briefings:{}};q.briefings[b.dataset.bsign]=new Date().toISOString();
+      await ackWrite(q,'Сақланди: инструктаж олдингиз');return;
+    }
+  });
+
+  /* ---------- admin view ---------- */
+  function fillSelect(el,opts,all){
+    var keep=el.value;
+    el.innerHTML=(all?'<option value="all">Барчаси</option>':'')+opts.map(function(o){return '<option>'+esc(o)+'</option>'}).join('');
+    if(keep&&(keep==='all'?all:opts.indexOf(keep)>-1))el.value=keep;
+  }
+  function renderMatrix(){
+    var sf=$('#f-station').value||'all';
+    var staff=activeStaff().filter(function(s){return sf==='all'||s.station===sf});
+    var docs=liveDocs();
+    var done=0,pend=0;
+    staff.forEach(function(s){var n=pendingDocs(s).length+pendingBriefs(s).length;pend+=n;if(!n)done++});
+    $('#m-sum').innerHTML='<span>Ходимлар: <b>'+staff.length+'</b></span><span class="chip ok">Тўлиқ танишган: '+done+'</span><span class="chip '+(pend?'warn':'ok')+'">Кутаётган белгилар: '+pend+'</span>';
+    if(!staff.length||!docs.length){
+      $('#m-table').innerHTML='<tbody><tr><td class="muted" style="padding:20px">'+(!staff.length?'Ходимлар рўйхати бўш. «Ходимлар» бўлимида қўшинг.':'Ҳужжат йўқ. «Ҳужжатлар» бўлимида йўриқнома қўшинг.')+'</td></tr></tbody>';return;
+    }
+    var h='<thead><tr><th class="name">Ходим</th>'+docs.map(function(d){return '<th class="doc"><span class="cat">'+esc(d.category)+'</span>'+esc(d.title)+' <span class="mono">в'+esc(d.version)+'</span></th>'}).join('')+'<th class="doc">Инструктаж</th></tr></thead><tbody>';
+    staff.forEach(function(s){
+      h+='<tr><td class="name"><b>'+esc(s.name)+'</b>'+(s.sample?' <span class="chip sample">НАМУНА</span>':'')+'<br><span class="muted small">'+esc(s.position)+(sf==='all'?' · '+esc(s.station):'')+'</span></td>';
+      docs.forEach(function(d){
+        if(!required(s,d)){h+='<td class="c na">—</td>';return}
+        var t=docAt(s,d);h+=t?'<td class="c ok" title="'+esc(fmtDT(t))+'">✓ '+fmtShort(t)+'</td>':'<td class="c pend">кутмоқда</td>';
+      });
+      var mine=S.briefings.filter(function(b){return (b.staffIds||[]).indexOf(s.id)>-1});
+      var got=mine.filter(function(b){return briefAt(s,b)}).length;
+      h+=!mine.length?'<td class="c na">—</td>':got===mine.length?'<td class="c ok">✓ '+got+'/'+mine.length+'</td>':'<td class="c pend">'+got+'/'+mine.length+'</td>';
+      h+='</tr>';
+    });
+    h+='</tbody><tfoot><tr><td class="name" style="background:var(--surface2)">Танишган</td>';
+    docs.forEach(function(d){var req=staff.filter(function(s){return required(s,d)}),ok=req.filter(function(s){return docAt(s,d)}).length;h+='<td class="c">'+ok+'/'+req.length+'</td>'});
+    h+='<td></td></tr></tfoot>';
+    $('#m-table').innerHTML=h;
+  }
+
+  function renderPartic(force){
+    var box=$('#b-partic'),st=$('#b-station').value;
+    var prev={},first=!box.dataset.init||force;
+    box.querySelectorAll('input').forEach(function(i){prev[i.value]=i.checked});
+    var list=activeStaff().filter(function(s){return !st||s.station===st});
+    box.innerHTML=list.map(function(s){var c=first||prev[s.id]===undefined?true:prev[s.id];return '<label><input type="checkbox" value="'+esc(s.id)+'"'+(c?' checked':'')+'> '+esc(s.name)+' <span class="muted small">'+esc(s.position)+'</span></label>'}).join('')||'<span class="muted small">Бу АГНКСда ходим йўқ.</span>';
+    box.dataset.init='1';
+  }
+  function renderBrief(){
+    var list=S.briefings.slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date))||String(b.createdAt||'').localeCompare(String(a.createdAt||''))});
+    if(!list.length){$('#b-table').innerHTML='<tbody><tr><td class="muted" style="padding:20px">Журнал бўш. Юқоридаги шакл орқали биринчи ёзувни қўшинг.</td></tr></tbody>';return}
+    var h='<thead><tr><th>Сана</th><th>Тури</th><th>Мавзу</th><th>Ўтказди</th><th>Қабул қилди</th><th></th></tr></thead><tbody>';
+    list.forEach(function(b){
+      var ids=b.staffIds||[],got=ids.filter(function(id){var s=S.staff.find(function(x){return x.id===id});return s&&briefAt(s,b)}).length;
+      h+='<tr><td class="mono small" style="white-space:nowrap">'+fmtD(b.date)+'</td><td>'+esc(b.type)+'</td><td>'+esc(b.topic)+'</td><td>'+esc(b.conductor)+'</td><td><span class="chip '+(got===ids.length?'ok':'warn')+'">'+got+'/'+ids.length+'</span></td><td style="white-space:nowrap"><button type="button" class="btn ghost sm" data-bx="'+esc(b.id)+'">'+(openBrief[b.id]?'Ёпиш':'Рўйхат')+'</button> <button type="button" class="btn danger sm" data-bdel="'+esc(b.id)+'">Ўчириш</button></td></tr>';
+      if(openBrief[b.id]){
+        h+='<tr><td colspan="6" style="background:var(--surface2)"><div class="checks">'+ids.map(function(id){var s=S.staff.find(function(x){return x.id===id});if(!s)return '';var t=briefAt(s,b);return '<div class="small"><b>'+esc(s.name)+'</b> — '+(t?'<span style="color:var(--ok)">'+fmtDT(t)+'</span>':'<span style="color:var(--warn)">кутмоқда</span>')+'</div>'}).join('')+'</div></td></tr>';
+      }
+    });
+    $('#b-table').innerHTML=h+'</tbody>';
+  }
+
+  function renderDocs(){
+    var fm=$('#d-form');$('#d-home').appendChild(fm);
+    var list=S.docs.slice().sort(function(a,b){return (a.archived?1:0)-(b.archived?1:0)||String(a.category).localeCompare(String(b.category),'ru')||String(a.title).localeCompare(String(b.title),'ru')});
+    if(!list.length){$('#d-list').innerHTML='<div class="state">Ҳужжат йўқ. Юқоридаги шакл орқали биринчи йўриқномани қўшинг.</div>';return}
+    $('#d-list').innerHTML=list.map(function(d){
+      var req=S.staff.filter(function(s){return required(s,d)}),ok=req.filter(function(s){return docAt(s,d)}).length;
+      return '<div class="item"'+(d.archived?' style="opacity:.6"':'')+'><div class="item-top"><span class="chip">'+esc(d.category)+'</span><span class="chip mono">в'+esc(d.version)+'</span>'+(d.archived?'<span class="chip">архив</span>':'<span class="chip '+(ok===req.length&&req.length?'ok':'warn')+'">танишган '+ok+'/'+req.length+'</span>')+(d.draft?'<span class="chip warn sample">ЛОЙИҲА</span>':'')+(d.sample?'<span class="chip sample">НАМУНА</span>':'')+'</div><h3>'+esc(d.title)+'</h3><span class="muted small">Сана: '+fmtD(d.issued)+' · '+(d.positions&&d.positions.length?esc(d.positions.join(', ')):'ҳамма лавозим')+'</span><div class="row"><button type="button" class="btn ghost sm" data-dedit="'+esc(d.id)+'">Таҳрир / янги версия</button><button type="button" class="btn ghost sm" data-print="'+esc(d.id)+'">PDF</button><button type="button" class="btn ghost sm" data-darch="'+esc(d.id)+'">'+(d.archived?'Архивдан чиқариш':'Архивга')+'</button><button type="button" class="btn danger sm" data-ddel="'+esc(d.id)+'">Ўчириш</button></div><div data-slot="'+esc(d.id)+'"></div></div>';
+    }).join('');
+    if(editingId){$('#d-modal-box').appendChild(fm);$('#d-modal').hidden=false}else{$('#d-modal').hidden=true}
+  }
+  function renderStaff(){
+    var list=activeStaff();
+    if(!list.length){$('#s-table').innerHTML='<tbody><tr><td class="muted" style="padding:20px">Ходим йўқ. Юқоридаги шакл орқали қўшинг.</td></tr></tbody>';return}
+    $('#s-table').innerHTML='<thead><tr><th>Ф.И.Ш.</th><th>Лавозим</th><th>АГНКС</th><th>Кабинет</th><th></th></tr></thead><tbody>'+list.map(function(s){
+      var linked=acksOf(s).length>0;
+      return '<tr><td><b>'+esc(s.name)+'</b>'+(s.sample?' <span class="chip sample">НАМУНА</span>':'')+'</td><td>'+esc(s.position)+'</td><td>'+esc(s.station)+'</td><td><span class="chip '+(linked?'ok':'')+'">'+(linked?'уланган':'уланмаган')+'</span></td><td><button type="button" class="btn danger sm" data-sdel="'+esc(s.id)+'">Ўчириш</button></td></tr>';
+    }).join('')+'</tbody>';
+  }
+  function tgText(s){
+    var pd=pendingDocs(s),pb=pendingBriefs(s),i=0,lines=[];
+    pd.forEach(function(d){lines.push((++i)+') '+d.title+' (в'+d.version+')')});
+    pb.forEach(function(b){lines.push((++i)+') Инструктаж: '+b.topic+' ('+fmtD(b.date)+')')});
+    return 'Ассалому алайкум, '+s.name+'!\nСизда танишув кутаётган ҳужжатлар бор:\n'+lines.join('\n')+'\n\nКабинетни очиб, ҳар бирига «Танишдим» тугмасини босинг:\n'+location.origin+location.pathname;
+  }
+  function renderTG(){
+    var rows=activeStaff().filter(function(s){return pendingDocs(s).length+pendingBriefs(s).length>0});
+    if(!rows.length){$('#tg-list').innerHTML='<div class="state ok"><h2>Эслатма керак эмас</h2><span>Ҳамма ходим барча ҳужжатлар билан танишган.</span></div>';return}
+    $('#tg-list').innerHTML=rows.map(function(s){
+      return '<div class="item"><div class="row sp"><div><b>'+esc(s.name)+'</b> <span class="muted small">'+esc(s.position)+' · '+esc(s.station)+'</span></div><button type="button" class="btn sm" data-copy="'+esc(s.id)+'">Нусхалаш</button></div><div class="msg" id="msg-'+esc(s.id)+'">'+esc(tgText(s))+'</div></div>';
+    }).join('');
+  }
+  function selectNode(n){try{var r=document.createRange();r.selectNodeContents(n);var s=getSelection();s.removeAllRanges();s.addRange(r)}catch(e){}}
+
+  function renderAdmin(){
+    var st=stations();
+    fillSelect($('#f-station'),st,true);
+    fillSelect($('#b-station'),st,false);
+    var pos={};S.staff.forEach(function(s){if(s.position)pos[s.position]=1});
+    $('#dl-pos').innerHTML=Object.keys(pos).map(function(p){return '<option value="'+esc(p)+'">'}).join('');
+    $('#dl-st').innerHTML=st.map(function(p){return '<option value="'+esc(p)+'">'}).join('');
+    renderMatrix();renderPartic(false);renderBrief();renderDocs();renderStaff();renderTG();
+  }
+
+  /* admin events */
+  var atab='matrix';
+  function showTab(t){
+    atab=t;
+    ['matrix','brief','docs','staff','tg'].forEach(function(k){$('#p-'+k).hidden=(k!==t)});
+    document.querySelectorAll('#atabs button').forEach(function(b){b.setAttribute('aria-selected',String(b.dataset.t===t))});
+  }
+  $('#atabs').addEventListener('click',function(e){var b=e.target.closest('button');if(b)showTab(b.dataset.t)});
+  $('#f-station').addEventListener('change',renderMatrix);
+  $('#b-station').addEventListener('change',function(){renderPartic(true)});
+  var armed={};
+  function arm(btn,key,fn){
+    if(armed[key]){clearTimeout(armed[key]);delete armed[key];fn();return}
+    var old=btn.textContent;btn.textContent='Тасдиқлаш';btn.classList.add('armed');
+    armed[key]=setTimeout(function(){delete armed[key];btn.textContent=old;btn.classList.remove('armed')},3500);
+  }
+  async function guard(fn,okmsg){try{await fn();if(okmsg)toast(okmsg)}catch(e){toast('Сақланмади. Рухсат ёки интернетни текширинг.')}}
+
+  $('#b-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var ids=[].map.call($('#b-partic').querySelectorAll('input:checked'),function(i){return i.value});
+    if(!ids.length){toast('Қатнашчиларни танланг');return}
+    guard(async function(){
+      var ref=db.collection('briefings').doc();
+      await ref.set({date:$('#b-date').value,type:$('#b-type').value,topic:$('#b-topic').value.trim(),conductor:$('#b-cond').value.trim(),station:$('#b-station').value,staffIds:ids,createdAt:new Date().toISOString()});
+      $('#b-topic').value='';
+    },'Журналга ёзилди');
+  });
+  function resetDocForm(){
+    editingId=null;$('#d-h').textContent='Янги йўриқнома';$('#d-title').value='';$('#d-ver').value=1;$('#d-date').value=today();$('#d-status').value='Лойиҳа';$('#d-pos').value='';$('#d-body').value='';$('#d-cancel').hidden=true;$('#d-hint').textContent='';renderDocs();
+  }
+  $('#d-cancel').addEventListener('click',resetDocForm);
+  $('#d-modal').addEventListener('click',function(e){if(e.target.id==='d-modal')resetDocForm()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&editingId)resetDocForm()});
+  $('#d-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    var id=editingId,pos=$('#d-pos').value.split(',').map(function(x){return x.trim()}).filter(Boolean);
+    guard(async function(){
+      var ref=id?db.doc('docs/'+id):db.collection('docs').doc();
+      var old=id?S.docs.find(function(d){return d.id===id}):null;
+      await ref.set({title:$('#d-title').value.trim(),category:$('#d-cat').value,version:Number($('#d-ver').value)||1,issued:$('#d-date').value,positions:pos,body:$('#d-body').value,archived:old?!!old.archived:false,sample:false,draft:$('#d-status').value==='Лойиҳа',createdAt:old&&old.createdAt?old.createdAt:new Date().toISOString()});
+      resetDocForm();
+    },'Ҳужжат сақланди');
+  });
+  $('#s-form').addEventListener('submit',function(e){
+    e.preventDefault();
+    guard(async function(){
+      await db.collection('staff').doc().set({name:$('#s-name').value.trim(),position:$('#s-pos').value.trim(),station:$('#s-station').value.trim(),active:true,sample:false});
+      $('#s-name').value='';
+    },'Ходим қўшилди');
+  });
+  $('#p-brief').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.bx){openBrief[b.dataset.bx]=!openBrief[b.dataset.bx];renderBrief();return}
+    if(b.dataset.bdel)arm(b,'b'+b.dataset.bdel,function(){guard(function(){return db.doc('briefings/'+b.dataset.bdel).delete()},'Ўчирилди')});
+  });
+  $('#d-list').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.dedit){
+     try{
+      var d=S.docs.find(function(x){return x.id===b.dataset.dedit});if(!d){toast('Ҳужжат топилмади');return}
+      editingId=d.id;$('#d-h').textContent='Таҳрир: '+d.title;$('#d-title').value=d.title;$('#d-cat').value=d.category;$('#d-ver').value=d.version;$('#d-status').value=d.draft?'Лойиҳа':'Тасдиқланган';$('#d-date').value=d.issued||today();$('#d-pos').value=(d.positions||[]).join(', ');$('#d-body').value=d.body||'';
+      $('#d-cancel').hidden=false;$('#d-hint').textContent='Версия рақами оширилса, ҳамма ходим қайтадан танишади. Рақам ўзгармаса, фақат матн тузатилади.';
+      renderDocs();$('#d-title').focus();}catch(err){toast('Таҳрир очилмади: '+(err&&err.message||err))}return;
+    }
+    if(b.dataset.darch){var dd=S.docs.find(function(x){return x.id===b.dataset.darch});if(dd)guard(function(){return db.doc('docs/'+dd.id).update({archived:!dd.archived})});return}
+    if(b.dataset.ddel)arm(b,'d'+b.dataset.ddel,function(){guard(function(){return db.doc('docs/'+b.dataset.ddel).delete()},'Ўчирилди')});
+  });
+  $('#s-table').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b||!b.dataset.sdel)return;
+    arm(b,'s'+b.dataset.sdel,function(){guard(function(){return db.doc('staff/'+b.dataset.sdel).delete()},'Ўчирилди')});
+  });
+  $('#tg-list').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(!b||!b.dataset.copy)return;
+    var s=S.staff.find(function(x){return x.id===b.dataset.copy});if(!s)return;
+    var txt=tgText(s),node=document.getElementById('msg-'+s.id);
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast('Нусхаланди')},function(){selectNode(node);toast('Матн белгиланди, нусхаланг')})}
+    else{selectNode(node);toast('Матн белгиланди, нусхаланг')}
+  });
+  $('#csv-btn').addEventListener('click',async function(){
+    if(!downloads){toast('Бу кўринишда юклаш мавжуд эмас');return}
+    var rows=[['Тури','Ф.И.Ш.','Лавозим','АГНКС','Ҳужжат / мавзу','Версия / тур','Сана ва вақт']];
+    activeStaff().forEach(function(s){
+      liveDocs().forEach(function(d){var t=docAt(s,d);if(t)rows.push(['Ҳужжат',s.name,s.position,s.station,d.title,'в'+d.version,fmtDT(t)])});
+      S.briefings.forEach(function(b){var t=briefAt(s,b);if(t)rows.push(['Инструктаж',s.name,s.position,s.station,b.topic,b.type,fmtDT(t)])});
+    });
+    var csv='﻿'+rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(';')}).join('\r\n');
+    try{await downloads.save({filename:'agnks-tanishuv-jurnali.csv',data:csv})}catch(e){if(!e||e.code!=='declined')toast('Юклаб бўлмади')}
+  });
+
+  /* ---------- shell ---------- */
+  function setView(v,push){
+    if(v==='admin'&&!isAdmin)v='worker';
+    view=v;
+    $('#v-worker').hidden=(v!=='worker');$('#v-admin').hidden=(v!=='admin');
+    $('#vb-worker').setAttribute('aria-pressed',String(v==='worker'));$('#vb-admin').setAttribute('aria-pressed',String(v==='admin'));
+    if(push){try{location.hash=v==='admin'?'#nazorat':'#hodim'}catch(e){}}
+    render();
+  }
+  function render(){if(view==='worker')renderWorker();else renderAdmin()}
+  $('#vb-worker').addEventListener('click',function(){setView('worker',true)});
+  $('#vb-admin').addEventListener('click',function(){setView('admin',true)});
+  window.addEventListener('hashchange',function(){setView(location.hash==='#nazorat'?'admin':'worker',false)});
+
+  $('#b-date').value=today();$('#d-date').value=today();
+  renderWorker();
+
+  function listen(name,key){
+    db.collection(name).onSnapshot(function(snap){
+      S[key]=snap.docs.map(function(d){var o=Object.assign({},d.data()||{});o.id=d.id;return o});
+      if(ready)render();
+    },function(err){dbErr='Маълумот ўқилмади ('+(err&&err.code||'хато')+')';render()});
+  }
+  (async function boot(){
+    var c=window.claude;
+    try{var u=c&&await c.use('user');if(u){uid=await u.id();isAdmin=await u.canEdit()}}catch(e){}
+    try{db=c?await c.use('db'):null}catch(e){db=null}
+    try{downloads=c?await c.use('downloads'):null}catch(e){downloads=null}
+    $('#viewseg').hidden=!isAdmin;
+    if(!downloads)$('#csv-btn').hidden=true;
+    if(db){listen('staff','staff');listen('docs','docs');listen('briefings','briefings');listen('acks','acks')}
+    ready=true;
+    var h=location.hash;
+    setView(h==='#nazorat'?'admin':h==='#hodim'?'worker':(isAdmin?'admin':'worker'),false);
+  })();
+})();
+</script>
