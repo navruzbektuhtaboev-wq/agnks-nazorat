@@ -77,9 +77,6 @@ class Banner(Flowable):
         c=s.canv; logo(c,0,2*mm,15*mm)
         c.setFillColor(colors.HexColor("#0B4F8A")); c.setFont("S-B",14); c.drawString(18*mm,10*mm,ORG)
         c.setFillColor(colors.HexColor("#444444")); c.setFont("S",9.5); c.drawString(18*mm,5*mm,"Автомобилларга газ қуйиш компрессор станцияси "+STATION)
-        x=s.w-5*13*mm
-        for k in ["nosmoke","noflame","gas","ext","exit"]:
-            sign(c,k,x,2*mm,12*mm); x+=13*mm
         c.setStrokeColor(colors.HexColor("#0B4F8A")); c.setLineWidth(1.2); c.line(0,0.5*mm,s.w,0.5*mm)
 
 def esc(t): return t.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")

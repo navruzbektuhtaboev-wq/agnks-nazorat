@@ -294,9 +294,8 @@ tr:last-child td{border-bottom:0}
       else if(x.indexOf('Асос:')===0)h+='<div class="src">'+esc(x)+'</div>';
       else if(x.indexOf('- ')===0)h+='<div class="b">— '+esc(x.slice(2))+'</div>';
       else h+='<div class="p">'+esc(x)+'</div>'});
-    var sg=['nosmoke','noflame','gas','ext','exit'].map(function(k){return SG[k]}).join('');
     return '<div class="bar"><button type="button" class="btn big" id="pr-go">PDF / Чоп этиш</button><button type="button" class="btn ghost" id="pr-x">Ёпиш</button><span class="hint">«PDF / Чоп этиш» ни босинг → принтер ўрнига «PDF сифатида сақлаш»ни танланг. Компьютерда Ctrl+P ҳам ишлайди.</span></div>'
-    +'<div class="sheet"><div class="ban">'+SG.logo+'<div><b>«ПОЙТУГ 888» МЧЖ</b><small>Автомобилларга газ қуйиш компрессор станцияси АГНКС-1</small></div><div class="sg">'+sg+'</div></div>'
+    +'<div class="sheet"><div class="ban">'+SG.logo+'<div><b>«ПОЙТУГ 888» МЧЖ</b><small>Автомобилларга газ қуйиш компрессор станцияси АГНКС-1</small></div></div>'
     +'<div class="ap"><b>ТАСДИҚЛАЙМАН</b><br>АГНКС бошлиғи<br>______________ ______________<br>«____» __________ 20___ й.</div>'
     +'<div class="k">ЙЎРИҚНОМА № ____</div><h1>'+esc(String(d.title).toUpperCase())+'</h1><div class="k">'+esc(d.category)+' · Версия '+esc(d.version)+' · Сана: '+fmtD(d.issued)+'</div>'
     +h+'<div class="sig">Ишлаб чиқди: ______________ / ______________<br>Меҳнат муҳофазаси бўйича масъул: ______________ / ______________</div>'
